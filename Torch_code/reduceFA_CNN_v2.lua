@@ -11,7 +11,7 @@ cmd:text('Reducing False Alarms using CNNs')
 cmd:text()
 cmd:text('Options:')
 -- Data
-cmd:option('-data', '/home/heehwan/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v1.h5')
+cmd:option('-data', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v1.h5')
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
@@ -302,5 +302,5 @@ recordfile:write('/test_err', result_test_err)
 recordfile:close()
 -- table.save(result_train, 'result_train_pre')
 -- table.save(result_test, 'result_test_pre')
-require 'gnuplot'
-gnuplot.plot({'Train', result_train_err}, {'Test', result_test_err})
+-- require 'gnuplot'
+-- gnuplot.plot({'Train', result_train_err}, {'Test', result_test_err})
