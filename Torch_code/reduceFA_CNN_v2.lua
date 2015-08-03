@@ -265,6 +265,7 @@ function test()
     local err = criterion:forward(pred, target)
     f = f + err
     confusion:add(pred, target)
+    print(torch.max(pred))
   end
 
   time = sys.clock() - time
