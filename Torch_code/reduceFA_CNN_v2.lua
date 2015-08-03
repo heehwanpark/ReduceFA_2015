@@ -255,6 +255,9 @@ function test()
   test_count = test_count or 1
   local f = 0
   local time = sys.clock()
+
+  local acc_list = torch.zeros(nTesting)
+
   model:evaluate()
   print ('==> testing on test set:')
   for t = 1, nTesting do
@@ -265,7 +268,18 @@ function test()
     local err = criterion:forward(pred, target)
     f = f + err
     confusion:add(pred, target)
-    print(torch.max(pred))
+
+    y,i_y = torch.max(pred)
+    if i_y == target then
+      acc_list[t] = 1
+    end
+  end
+
+  if test_count == Maxiter then
+    l = torch.cat(shuffle[{nTraining+1, nElement}], acc_list, 2)
+    faultfile = hdf5.open('/home/heehwan/files/faultfile.h5', 'w')
+    faultfile:write('/list', l)
+    faultfile:close()
   end
 
   time = sys.clock() - time
