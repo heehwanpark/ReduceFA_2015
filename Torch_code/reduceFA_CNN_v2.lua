@@ -193,7 +193,7 @@ function train()
 
   model:training()
 
-  shuffle = torch.randperm(nTraining)
+  shuffle_t = torch.randperm(nTraining)
 
   print('==> doing epoch on training data:')
   print("==> online epoch # " .. epoch .. ' [batchSize = ' .. batchsize .. ']')
@@ -202,9 +202,9 @@ function train()
     local targets = {}
     batchstart = (t-1)*batchsize+1
     for i = batchstart,batchstart+batchsize-1 do
-      local input = trainset_input[{{shuffle[i], {}}}]
+      local input = trainset_input[{{shuffle_t[i], {}}}]
       input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
-      local target = trainset_target[shuffle[i]][1]+1
+      local target = trainset_target[shuffle_t[i]][1]+1
       table.insert(inputs, input)
       table.insert(targets, target)
     end
@@ -274,7 +274,7 @@ function test()
       acc_list[t] = 1
     end
   end
-  
+
   if test_count == Maxiter then
     print(shuffle[{{nTraining+1, nElement}}]:size())
     print(acc_list:size())
