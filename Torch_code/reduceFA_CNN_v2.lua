@@ -30,7 +30,7 @@ cmd:option('-beta', 1)
 cmd:option('-seed', 1)
 cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
-cmd:option('-maxIter', 20)
+cmd:option('-maxIter', 1)
 cmd:option('-lr_sup', 0.01, 'Learning rate')
 cmd:option('-lr_unsup', 1e-5, 'Learning rate')
 cmd:option('-lrdecay',1e-4, 'Learning rate decay')
@@ -274,9 +274,11 @@ function test()
       acc_list[t] = 1
     end
   end
-
+  
   if test_count == Maxiter then
-    l = torch.cat(shuffle[{nTraining+1, nElement}], acc_list, 2)
+    print(shuffle[{{nTraining+1, nElement}}]:size())
+    print(acc_list:size())
+    l = torch.cat(shuffle[{{nTraining+1, nElement}}], acc_list, 2)
     faultfile = hdf5.open('/home/heehwan/files/faultfile.h5', 'w')
     faultfile:write('/list', l)
     faultfile:close()
