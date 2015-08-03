@@ -269,8 +269,8 @@ function test()
     f = f + err
     confusion:add(pred, target)
 
-    y,i_y = torch.max(pred)
-    if i_y == target then
+    y,i_y = torch.max(pred,1)
+    if i_y[1] == target then
       acc_list[t] = 1
     end
   end
@@ -279,7 +279,7 @@ function test()
     print(shuffle[{{nTraining+1, nElement}}]:size())
     print(acc_list:size())
     l = torch.cat(shuffle[{{nTraining+1, nElement}}], acc_list, 2)
-    faultfile = hdf5.open('faultfile.h5', 'w')
+    faultfile = hdf5.open('/home/heehwan/faultfile.h5', 'w')
     faultfile:write('/list', l)
     faultfile:close()
   end
