@@ -61,12 +61,12 @@ mit_labelset_target = mit_datafile:read('/targets'):all()
 mit_datafile:close()
 
 chal_datafile = hdf5.open(option.chaldata, 'r')
-chal_pretrainset = chal_datafile:read('/pretrain'):all()
+-- chal_pretrainset = chal_datafile:read('/pretrain'):all()
 chal_labelset_input = chal_datafile:read('/input'):all()
 chal_labelset_target = chal_datafile:read('/target'):all()
 chal_datafile:close()
 
-chal_pretrainset = chal_pretrainset:transpose(1,2)
+-- chal_pretrainset = chal_pretrainset:transpose(1,2)
 chal_labelset_input = chal_labelset_input:transpose(1,2)
 chal_labelset_target = chal_labelset_target:transpose(1,2)
 
@@ -117,11 +117,11 @@ print(model)
 ----------------------------------------------------------------------
 print '==> Defining loss'
 
-weight = torch.Tensor(2)
-weight[1] = 0.15
-weight[2] = 0.85
-criterion = nn.ClassNLLCriterion(weight)
--- criterion = nn.ClassNLLCriterion()
+-- weight = torch.Tensor(2)
+-- weight[1] = 0.15
+-- weight[2] = 0.85
+-- criterion = nn.ClassNLLCriterion(weight)
+criterion = nn.ClassNLLCriterion()
 criterion:cuda()
 ----------------------------------------------------------------------
 print '==> Defining some tools'
@@ -150,10 +150,28 @@ nFold = option.nFold
 
 -- Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
 nMitSamples = mit_labelset_target:size(1)
-nChalSamples = chal_pretrainset:size(1)
+nChalSamples = chal_labelset_target:size(1)
+nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
+nChalTest = nChalSamples - nChalTrain
 
-nTraining = nMitSamples + nChalSamples
-nTesting = chal_labelset_target:size(1)
+Chal_shuffle = torch.randperm(nElement)
+
+chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
+chal_trainset_target = torch.zeros(nChalTrain, 1)
+for i = 1, nChalTrain do
+  chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
+  chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
+end
+
+chal_testset_input = torch.zeros(nChalTest, option.inputSize)
+chal_testset_target = torch.zeros(nChalTest, 1)
+for j = 1, nChalTest do
+  chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
+  chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
+end
+
+nTraining = nMitSamples + nChalTrain
+nTesting = nChalTest
 nElement = nTraining + nTesting
 
 trainset_input = torch.zeros(nTraining, option.inputSize)
@@ -164,13 +182,13 @@ for i = 1, nMitSamples do
   trainset_target[i] = mit_labelset_target[i]
 end
 
-for i = 1, nChalSamples do
-  trainset_input[{nMitSamples+i, {}}] = chal_pretrainset[{i, {}}]
-  -- trainset_target[nMitSamples+i] = mit_labelset_target[i]
+for i = 1, nChalTrain do
+  trainset_input[{nMitSamples+i, {}}] = chal_trainset_input[{i, {}}]
+  trainset_target[nMitSamples+i] = chal_trainset_target[i]
 end
 
-testset_input = chal_labelset_input
-testset_target = chal_labelset_target
+testset_input = chal_testset_input
+testset_target = chal_testset_target
 
 print(trainset_input:size())
 print(testset_input:size())
