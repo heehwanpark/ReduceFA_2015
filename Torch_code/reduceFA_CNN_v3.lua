@@ -69,6 +69,9 @@ chal_labelset_input = chal_datafile:read('/input'):all()
 chal_labelset_target = chal_datafile:read('/target'):all()
 chal_datafile:close()
 
+chal_labelset_input = chal_labelset_input:transpose(1,2)
+chal_labelset_target = chal_labelset_target:transpose(1,2)
+
 print(chal_labelset_input:size())
 print(chal_labelset_target:size())
 
@@ -156,9 +159,6 @@ trainset_target = mit_labelset_target
 
 testset_input = chal_labelset_input
 testset_target = chal_labelset_target
-
-print(trainset_input:size())
-print(testset_input:size())
 
 result_train_accu = torch.zeros(option.maxIter)
 result_train_err = torch.zeros(option.maxIter)
