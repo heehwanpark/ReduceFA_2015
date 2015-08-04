@@ -117,7 +117,11 @@ print(model)
 ----------------------------------------------------------------------
 print '==> Defining loss'
 
-criterion = nn.ClassNLLCriterion()
+weight = torch.Tensor(2)
+weight[1] = 0.15
+weight[2] = 0.85
+criterion = nn.ClassNLLCriterion(weight)
+-- criterion = nn.ClassNLLCriterion()
 criterion:cuda()
 ----------------------------------------------------------------------
 print '==> Defining some tools'
