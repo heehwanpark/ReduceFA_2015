@@ -60,20 +60,15 @@ mit_labelset_input = mit_datafile:read('/inputs'):all()
 mit_labelset_target = mit_datafile:read('/targets'):all()
 mit_datafile:close()
 
-print(mit_labelset_input:size())
-print(mit_labelset_target:size())
-
 chal_datafile = hdf5.open(option.chaldata, 'r')
--- local pretrainset = datafile:read('/pretrain'):all()
+chal_pretrainset = chal_datafile:read('/pretrain'):all()
 chal_labelset_input = chal_datafile:read('/input'):all()
 chal_labelset_target = chal_datafile:read('/target'):all()
 chal_datafile:close()
 
+chal_pretrainset = chal_pretrainset:transpose(1,2)
 chal_labelset_input = chal_labelset_input:transpose(1,2)
 chal_labelset_target = chal_labelset_target:transpose(1,2)
-
-print(chal_labelset_input:size())
-print(chal_labelset_target:size())
 
 ----------------------------------------------------------------------
 require 'cutorch'
@@ -149,16 +144,32 @@ batchsize = option.batchsize
 
 nFold = option.nFold
 
--- Training: MIT-BIH, Testing: Chal-2015
-nTraining = mit_labelset_target:size(1)
+-- Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
+nMitSamples = mit_labelset_target:size(1)
+nChalSamples = chal_pretrainset:size(1)
+
+nTraining = nMitSamples + nChalSamples
 nTesting = chal_labelset_target:size(1)
 nElement = nTraining + nTesting
 
-trainset_input = mit_labelset_input
-trainset_target = mit_labelset_target
+trainset_input = torch.zeros(nTraining, option.inputSize)
+trainset_target = torch.zeros(nTraining, 1)
+
+for i = 1, nMitSamples do
+  trainset_input[{i, {}}] = mit_labelset_input[{i, {}}]
+  trainset_target[i] = mit_labelset_target[i]
+end
+
+for i = 1, nChalSamples do
+  trainset_input[{nMitSamples+i, {}}] = chal_pretrainset[{i, {}}]
+  -- trainset_target[nMitSamples+i] = mit_labelset_target[i]
+end
 
 testset_input = chal_labelset_input
 testset_target = chal_labelset_target
+
+print(trainset_input:size())
+print(testset_input:size())
 
 result_train_accu = torch.zeros(option.maxIter)
 result_train_err = torch.zeros(option.maxIter)
