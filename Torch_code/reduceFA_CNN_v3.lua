@@ -148,7 +148,7 @@ batchsize = option.batchsize
 
 nFold = option.nFold
 ----------------------------------------------------------------------
-Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
+-- Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
 nMitSamples = mit_labelset_target:size(1)
 nChalSamples = chal_labelset_target:size(1)
 nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
