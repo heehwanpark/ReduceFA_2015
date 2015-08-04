@@ -154,7 +154,7 @@ nChalSamples = chal_labelset_target:size(1)
 nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
 nChalTest = nChalSamples - nChalTrain
 
-Chal_shuffle = torch.randperm(nElement)
+Chal_shuffle = torch.randperm(nChalSamples)
 
 chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
 chal_trainset_target = torch.zeros(nChalTrain, 1)
