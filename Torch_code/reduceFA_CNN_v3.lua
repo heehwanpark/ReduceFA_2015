@@ -147,46 +147,9 @@ parameters, gradParameters = model:getParameters()
 batchsize = option.batchsize
 
 nFold = option.nFold
-
--- Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
--- nMitSamples = mit_labelset_target:size(1)
--- nChalSamples = chal_labelset_target:size(1)
--- nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
--- nChalTest = nChalSamples - nChalTrain
---
--- Chal_shuffle = torch.randperm(nChalSamples)
---
--- chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
--- chal_trainset_target = torch.zeros(nChalTrain, 1)
--- for i = 1, nChalTrain do
---   chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
---   chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
--- end
---
--- chal_testset_input = torch.zeros(nChalTest, option.inputSize)
--- chal_testset_target = torch.zeros(nChalTest, 1)
--- for j = 1, nChalTest do
---   chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
---   chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
--- end
---
--- nTraining = nMitSamples + nChalTrain
--- nTesting = nChalTest
--- nElement = nTraining + nTesting
---
--- trainset_input = torch.zeros(nTraining, option.inputSize)
--- trainset_target = torch.zeros(nTraining, 1)
---
--- for i = 1, nMitSamples do
---   trainset_input[{i, {}}] = mit_labelset_input[{i, {}}]
---   trainset_target[i] = mit_labelset_target[i]
--- end
---
--- for i = 1, nChalTrain do
---   trainset_input[{nMitSamples+i, {}}] = chal_trainset_input[{i, {}}]
---   trainset_target[nMitSamples+i] = chal_trainset_target[i]
--- end
-
+----------------------------------------------------------------------
+Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
+nMitSamples = mit_labelset_target:size(1)
 nChalSamples = chal_labelset_target:size(1)
 nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
 nChalTest = nChalSamples - nChalTrain
@@ -207,13 +170,50 @@ for j = 1, nChalTest do
   chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
 end
 
-nTraining = nChalTrain
+nTraining = nMitSamples + nChalTrain
 nTesting = nChalTest
-nElement = nChalSamples
+nElement = nTraining + nTesting
 
-trainset_input = chal_trainset_input
-trainset_target = chal_trainset_target
+trainset_input = torch.zeros(nTraining, option.inputSize)
+trainset_target = torch.zeros(nTraining, 1)
 
+for i = 1, nMitSamples do
+  trainset_input[{i, {}}] = mit_labelset_input[{i, {}}]
+  trainset_target[i] = mit_labelset_target[i]
+end
+
+for i = 1, nChalTrain do
+  trainset_input[{nMitSamples+i, {}}] = chal_trainset_input[{i, {}}]
+  trainset_target[nMitSamples+i] = chal_trainset_target[i]
+end
+----------------------------------------------------------------------
+-- nChalSamples = chal_labelset_target:size(1)
+-- nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
+-- nChalTest = nChalSamples - nChalTrain
+--
+-- Chal_shuffle = torch.randperm(nChalSamples)
+--
+-- chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
+-- chal_trainset_target = torch.zeros(nChalTrain, 1)
+-- for i = 1, nChalTrain do
+--   chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
+--   chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
+-- end
+--
+-- chal_testset_input = torch.zeros(nChalTest, option.inputSize)
+-- chal_testset_target = torch.zeros(nChalTest, 1)
+-- for j = 1, nChalTest do
+--   chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
+--   chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
+-- end
+--
+-- nTraining = nChalTrain
+-- nTesting = nChalTest
+-- nElement = nChalSamples
+--
+-- trainset_input = chal_trainset_input
+-- trainset_target = chal_trainset_target
+----------------------------------------------------------------------
 testset_input = chal_testset_input
 testset_target = chal_testset_target
 
