@@ -65,8 +65,8 @@ print(mit_labelset_target:size())
 
 chal_datafile = hdf5.open(option.chaldata, 'r')
 -- local pretrainset = datafile:read('/pretrain'):all()
-chal_labelset_input = datafile:read('/input'):all()
-chal_labelset_target = datafile:read('/target'):all()
+chal_labelset_input = chal_datafile:read('/input'):all()
+chal_labelset_target = chal_datafile:read('/target'):all()
 chal_datafile:close()
 
 print(chal_labelset_input:size())
