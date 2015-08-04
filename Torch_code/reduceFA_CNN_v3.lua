@@ -11,13 +11,14 @@ cmd:text('Reducing False Alarms using CNNs')
 cmd:text()
 cmd:text('Options:')
 -- Data
-cmd:option('-data', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
+cmd:option('-chaldata', '/home/salab/Documents/workspace/data/ReduceFA/chal2015_data_10sec_resampled.h5')
+cmd:option('-mitdata', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
 cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 1)
-cmd:option('-inputSize', 3600) -- 250Hz * 20sec
+cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
 cmd:option('-nFeatures1', 16)
 cmd:option('-nFeatures2', 64)
@@ -53,30 +54,25 @@ torch.setnumthreads(option.thread)
 print '==> Load datasets'
 
 require 'hdf5'
-datafile = hdf5.open(option.data, 'r')
+
+mit_datafile = hdf5.open(option.mitdata, 'r')
+mit_labelset_input = mit_datafile:read('/inputs'):all()
+mit_labelset_target = mit_datafile:read('/targets'):all()
+mit_datafile:close()
+
+print(mit_labelset_input:size())
+print(mit_labelset_target:size())
+
+chal_datafile = hdf5.open(option.chaldata, 'r')
 -- local pretrainset = datafile:read('/pretrain'):all()
-labelset_input = datafile:read('/inputs'):all()
-labelset_target = datafile:read('/targets'):all()
-datafile:close()
+chal_labelset_input = datafile:read('/input'):all()
+chal_labelset_target = datafile:read('/target'):all()
+chal_datafile:close()
 
+print(chal_labelset_input:size())
+print(chal_labelset_target:size())
 
 ----------------------------------------------------------------------
---
--- -- pretrainset1 = convertForPretrain(pretrainset)
---
--- if option.pretraining then
---   require 'unsup'
---   require 'ConvPSD_HH'
---   -- 1st layer
---   encoder1, decoder1 = trainConvPSD(pretrainset1, option.nInputFeature, option.nFeatures1, option, 'pretrain_result_layer1')
---   -- encoder1 = torch.load('pretrain_result_layer1_encoder.net')
---   -- decoder1 = torch.load('pretrain_result_layer1_decoder.net')
---   -- pretrainset2 = netsThrough(encoder1, pretrainset1)
---   -- -- 2nd layer
---   -- encoder2, decoder2 = trainConvPSD(pretrainset2, option.nFeatures1, option.nFeatures2, option, 'pretrain_result_layer2')
--- end
-----------------------------------------------------------------------
--- TODO: should we initialize imported module?
 require 'cutorch'
 require 'cunn'
 
@@ -149,31 +145,17 @@ parameters, gradParameters = model:getParameters()
 batchsize = option.batchsize
 
 nFold = option.nFold
-nElement = labelset_target:size(1)
-nTraining = nElement - math.floor(nElement/nFold)
-nTesting = nElement - nTraining
 
-shuffle = torch.randperm(nElement)
+-- Training: MIT-BIH, Testing: Chal-2015
+nTraining = mit_labelset_target:size(1)
+nTesting = chal_labelset_target:size(1)
+nElement = nTraining + nTesting
 
-trainset_input = torch.zeros(nTraining, option.inputSize)
-trainset_target = torch.zeros(nTraining, 1)
-for i = 1, nTraining do
-  trainset_input[{i, {}}] = labelset_input[{shuffle[i], {}}]
-  trainset_target[i] = labelset_target[shuffle[i]]
-end
+trainset_input = mit_labelset_input
+trainset_target = mit_labelset_target
 
-testset_input = torch.zeros(nTesting, option.inputSize)
-testset_target = torch.zeros(nTesting, 1)
-for j = 1, nTesting do
-  testset_input[{j, {}}] = labelset_input[{shuffle[j+nTraining], {}}]
-  testset_target[j] = labelset_target[shuffle[j+nTraining]]
-end
-
--- trainset_input = labelset_input[{{1,nTraining}, {}}]
--- trainset_target = labelset_target[{{1,nTraining}, {}}]
---
--- testset_input = labelset_input[{{nTraining+1, nElement}, {}}]
--- testset_target = labelset_target[{{nTraining+1, nElement}, {}}]
+testset_input = chal_labelset_input
+testset_target = chal_labelset_target
 
 print(trainset_input:size())
 print(testset_input:size())
