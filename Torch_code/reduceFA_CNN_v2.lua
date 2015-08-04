@@ -11,7 +11,7 @@ cmd:text('Reducing False Alarms using CNNs')
 cmd:text()
 cmd:text('Options:')
 -- Data
-cmd:option('-data', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v1.h5')
+cmd:option('-data', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
