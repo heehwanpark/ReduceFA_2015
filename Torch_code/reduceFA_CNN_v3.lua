@@ -73,11 +73,13 @@ chal_pretrainset = chal_pretrainset:transpose(1,2)
 chal_labelset_input = chal_labelset_input:transpose(1,2)
 chal_labelset_target = chal_labelset_target:transpose(1,2)
 ----------------------------------------------------------------------
-pretrainset1 = convertForPretrain(chal_pretrainset)
-
 if option.pretraining then
+  print '==> Set pretraining'
   require 'unsup'
   require 'ConvPSD_HH'
+
+  pretrainset1 = convertForPretrain(chal_pretrainset, option.inputSize)
+
   -- 1st layer
   encoder1, decoder1 = trainConvPSD(pretrainset1, option.nInputFeature, option.nFeatures_c1, option, 'pretrain_result_layer1')
   -- encoder1 = torch.load('pretrain_result_layer1_encoder.net')

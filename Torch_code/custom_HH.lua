@@ -8,13 +8,13 @@ function normalize_HH(data)
   end
 end
 
-function convertForPretrain(dataset)
+function convertForPretrain(dataset, inputSize)
   N = dataset:size(1)
   converted = {}
   for i = 1, N do
     data = dataset[{i, {}}]
     -- print(data[1]:size())
-    data = torch.reshape(data, 1, 5000, 1)
+    data = torch.reshape(data, 1, inputSize, 1)
     table.insert(converted, data)
   end
   return converted
