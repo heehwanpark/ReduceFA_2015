@@ -24,6 +24,7 @@ cmd:option('-nFeatures_c1', 100)
 cmd:option('-nFeatures_c2', 100)
 cmd:option('-nFeatures_c3', 100)
 cmd:option('-nFeatures_c4', 100)
+cmd:option('-nFeatures_c5', 100)
 --- For MLP
 cmd:option('-nFeatures_m1', 500)
 --- For PSD
@@ -113,9 +114,17 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 -- Calculate # of outputs
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
+-- 5th convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
+
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+
 -- Standard MLP
-model:add(nn.View(option.nFeatures_c4*nConvOut*1))
-model:add(nn.Linear(option.nFeatures_c4*nConvOut*1, option.nFeatures_m1))
+model:add(nn.View(option.nFeatures_c5*nConvOut*1))
+model:add(nn.Linear(option.nFeatures_c5*nConvOut*1, option.nFeatures_m1))
 model:add(nn.ReLU())
 model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
 model:add(nn.ReLU())
