@@ -20,10 +20,10 @@ cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 1)
 cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures_c1', 55)
-cmd:option('-nFeatures_c2', 55)
-cmd:option('-nFeatures_c3', 55)
-cmd:option('-nFeatures_c4', 55)
+cmd:option('-nFeatures_c1', 60)
+cmd:option('-nFeatures_c2', 60)
+cmd:option('-nFeatures_c3', 60)
+cmd:option('-nFeatures_c4', 60)
 --- For MLP
 cmd:option('-nFeatures_m1', 500)
 --- For PSD
@@ -34,7 +34,7 @@ cmd:option('-seed', 1)
 cmd:option('-batchsize', 10)
 cmd:option('-nFold', 5)
 cmd:option('-maxIter', 100)
-cmd:option('-lr_sup', 0.01, 'Learning rate')
+cmd:option('-lr_sup', 0.005, 'Learning rate')
 cmd:option('-lr_unsup', 1e-5, 'Learning rate')
 cmd:option('-lrdecay',1e-5, 'Learning rate decay')
 cmd:option('-momentum', 0)
