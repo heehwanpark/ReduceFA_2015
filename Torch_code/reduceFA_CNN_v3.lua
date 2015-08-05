@@ -44,6 +44,8 @@ cmd:option('-kernel', 10)
 cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
+-- File name
+cmd:option('-filename', '0805_result_1')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -362,10 +364,11 @@ while iter < Maxiter do
   iter = iter + 1
 end
 
+folder = '/home/salab/Documents/workspace/data/ReduceFA/output/'
 if option.pretraining then
-  recordfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/result_0805_pre.h5', 'w')
+  recordfile = hdf5.open(folder .. option.filename .. '_wi_pre.h5', 'w')
 else
-  recordfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/result_0805_comparison.h5', 'w')
+  recordfile = hdf5.open(folder .. option.filename .. '_wo_pre.h5', 'w')
 end
 recordfile:write('/train_accu', result_train_accu)
 recordfile:write('/train_err', result_train_err)
