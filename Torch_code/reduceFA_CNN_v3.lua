@@ -24,7 +24,7 @@ cmd:option('-nFeatures1', 150)
 cmd:option('-nFeatures2', 150)
 cmd:option('-nFeatures3', 150)
 --- For MLP
-cmd:option('-nFeatures3', 500)
+cmd:option('-nFeatures4', 500)
 --- For PSD
 cmd:option('-lambda', 1)
 cmd:option('-beta', 1)
@@ -105,13 +105,13 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- Standard MLP
-model:add(nn.View(option.nFeatures2*nConvOut*1))
-model:add(nn.Linear(option.nFeatures2*nConvOut*1, option.nFeatures3))
+model:add(nn.View(option.nFeatures3*nConvOut*1))
+model:add(nn.Linear(option.nFeatures3*nConvOut*1, option.nFeatures4))
 model:add(nn.ReLU())
-model:add(nn.Linear(option.nFeatures3, option.nFeatures3))
+model:add(nn.Linear(option.nFeatures4, option.nFeatures4))
 model:add(nn.ReLU())
 -- model:add(nn.Dropout(0.25))
-model:add(nn.Linear(option.nFeatures3, option.nTarget))
+model:add(nn.Linear(option.nFeatures4, option.nTarget))
 model:add(nn.LogSoftMax())
 
 if option.pretraining then
