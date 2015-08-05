@@ -20,8 +20,9 @@ cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 1)
 cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures1', 100)
-cmd:option('-nFeatures2', 100)
+cmd:option('-nFeatures1', 150)
+cmd:option('-nFeatures2', 150)
+cmd:option('-nFeatures3', 150)
 --- For MLP
 cmd:option('-nFeatures3', 500)
 --- For PSD
@@ -89,6 +90,14 @@ nConvOut = math.floor((option.inputSize - option.kernel + 1)/option.pool)
 
 -- 2nd convolution layer
 model:add(nn.SpatialConvolutionMM(option.nFeatures1, option.nFeatures2, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
+
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+
+-- 3rd convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures2, option.nFeatures3, 1, option.kernel))
 model:add(nn.ReLU())
 model:add(nn.SpatialMaxPooling(1, option.pool))
 
@@ -350,9 +359,9 @@ while iter < Maxiter do
 end
 
 if option.pretraining then
-  recordfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/result_0804_pre.h5', 'w')
+  recordfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/result_0805_pre.h5', 'w')
 else
-  recordfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/result_0804_comparison.h5', 'w')
+  recordfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/result_0805_comparison.h5', 'w')
 end
 recordfile:write('/train_accu', result_train_accu)
 recordfile:write('/train_err', result_train_err)
