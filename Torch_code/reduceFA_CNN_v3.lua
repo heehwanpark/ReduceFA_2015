@@ -38,7 +38,7 @@ cmd:option('-lr_sup', 0.005, 'Learning rate')
 cmd:option('-lr_unsup', 1e-5, 'Learning rate')
 cmd:option('-lrdecay',1e-5, 'Learning rate decay')
 cmd:option('-momentum', 0)
-cmd:option('-pretraining', false)
+cmd:option('-pretraining', true)
 -- Conv Setting
 cmd:option('-kernel', 10)
 cmd:option('-pool', 4)
@@ -58,21 +58,34 @@ torch.setnumthreads(option.thread)
 print '==> Load datasets'
 
 require 'hdf5'
-mit_datafile = hdf5.open(option.mitdata, 'r')
-mit_labelset_input = mit_datafile:read('/inputs'):all()
-mit_labelset_target = mit_datafile:read('/targets'):all()
-mit_datafile:close()
+-- mit_datafile = hdf5.open(option.mitdata, 'r')
+-- mit_labelset_input = mit_datafile:read('/inputs'):all()
+-- mit_labelset_target = mit_datafile:read('/targets'):all()
+-- mit_datafile:close()
 
 chal_datafile = hdf5.open(option.chaldata, 'r')
--- chal_pretrainset = chal_datafile:read('/pretrain'):all()
+chal_pretrainset = chal_datafile:read('/pretrain'):all()
 chal_labelset_input = chal_datafile:read('/input'):all()
 chal_labelset_target = chal_datafile:read('/target'):all()
 chal_datafile:close()
 
--- chal_pretrainset = chal_pretrainset:transpose(1,2)
+chal_pretrainset = chal_pretrainset:transpose(1,2)
 chal_labelset_input = chal_labelset_input:transpose(1,2)
 chal_labelset_target = chal_labelset_target:transpose(1,2)
+----------------------------------------------------------------------
+pretrainset1 = convertForPretrain(chal_pretrainset)
 
+if option.pretraining then
+  require 'unsup'
+  require 'ConvPSD_HH'
+  -- 1st layer
+  encoder1, decoder1 = trainConvPSD(pretrainset1, option.nInputFeature, option.nFeatures_c1, option, 'pretrain_result_layer1')
+  -- encoder1 = torch.load('pretrain_result_layer1_encoder.net')
+  -- decoder1 = torch.load('pretrain_result_layer1_decoder.net')
+  -- pretrainset2 = netsThrough(encoder1, pretrainset1)
+  -- -- 2nd layer
+  -- encoder2, decoder2 = trainConvPSD(pretrainset2, option.nFeatures1, option.nFeatures2, option, 'pretrain_result_layer2')
+end
 ----------------------------------------------------------------------
 require 'cutorch'
 require 'cunn'
