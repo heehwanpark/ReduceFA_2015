@@ -20,11 +20,11 @@ cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 1)
 cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures1', 150)
-cmd:option('-nFeatures2', 150)
-cmd:option('-nFeatures3', 150)
+cmd:option('-nFeatures_c1', 200)
+cmd:option('-nFeatures_c2', 200)
+cmd:option('-nFeatures_c3', 200)
 --- For MLP
-cmd:option('-nFeatures4', 500)
+cmd:option('-nFeatures_m1', 500)
 --- For PSD
 cmd:option('-lambda', 1)
 cmd:option('-beta', 1)
@@ -81,7 +81,7 @@ print '==> construct model'
 model = nn.Sequential()
 
 -- 1st convolution layer
-model:add(nn.SpatialConvolutionMM(option.nInputFeature, option.nFeatures1, 1, option.kernel))
+model:add(nn.SpatialConvolutionMM(option.nInputFeature, option.nFeatures_c1, 1, option.kernel))
 model:add(nn.ReLU())
 model:add(nn.SpatialMaxPooling(1, option.pool))
 
@@ -89,7 +89,7 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 nConvOut = math.floor((option.inputSize - option.kernel + 1)/option.pool)
 
 -- 2nd convolution layer
-model:add(nn.SpatialConvolutionMM(option.nFeatures1, option.nFeatures2, 1, option.kernel))
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c1, option.nFeatures_c2, 1, option.kernel))
 model:add(nn.ReLU())
 model:add(nn.SpatialMaxPooling(1, option.pool))
 
@@ -97,7 +97,7 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- 3rd convolution layer
-model:add(nn.SpatialConvolutionMM(option.nFeatures2, option.nFeatures3, 1, option.kernel))
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c2, option.nFeatures_c3, 1, option.kernel))
 model:add(nn.ReLU())
 model:add(nn.SpatialMaxPooling(1, option.pool))
 
@@ -105,13 +105,13 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- Standard MLP
-model:add(nn.View(option.nFeatures3*nConvOut*1))
-model:add(nn.Linear(option.nFeatures3*nConvOut*1, option.nFeatures4))
+model:add(nn.View(option.nFeatures_c3*nConvOut*1))
+model:add(nn.Linear(option.nFeatures_c3*nConvOut*1, option.nFeatures_m1))
 model:add(nn.ReLU())
-model:add(nn.Linear(option.nFeatures4, option.nFeatures4))
+model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
 model:add(nn.ReLU())
--- model:add(nn.Dropout(0.25))
-model:add(nn.Linear(option.nFeatures4, option.nTarget))
+model:add(nn.Dropout(0.5))
+model:add(nn.Linear(option.nFeatures_m1, option.nTarget))
 model:add(nn.LogSoftMax())
 
 if option.pretraining then
