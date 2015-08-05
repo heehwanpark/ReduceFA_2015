@@ -20,9 +20,10 @@ cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 1)
 cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures_c1', 200)
-cmd:option('-nFeatures_c2', 200)
-cmd:option('-nFeatures_c3', 200)
+cmd:option('-nFeatures_c1', 100)
+cmd:option('-nFeatures_c2', 100)
+cmd:option('-nFeatures_c3', 100)
+cmd:option('-nFeatures_c4', 100)
 --- For MLP
 cmd:option('-nFeatures_m1', 500)
 --- For PSD
@@ -32,7 +33,7 @@ cmd:option('-beta', 1)
 cmd:option('-seed', 1)
 cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
-cmd:option('-maxIter', 40)
+cmd:option('-maxIter', 30)
 cmd:option('-lr_sup', 0.005, 'Learning rate')
 cmd:option('-lr_unsup', 1e-5, 'Learning rate')
 cmd:option('-lrdecay',1e-5, 'Learning rate decay')
@@ -104,9 +105,17 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 -- Calculate # of outputs
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
+-- 4th convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c3, option.nFeatures_c4, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
+
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+
 -- Standard MLP
-model:add(nn.View(option.nFeatures_c3*nConvOut*1))
-model:add(nn.Linear(option.nFeatures_c3*nConvOut*1, option.nFeatures_m1))
+model:add(nn.View(option.nFeatures_c4*nConvOut*1))
+model:add(nn.Linear(option.nFeatures_c4*nConvOut*1, option.nFeatures_m1))
 model:add(nn.ReLU())
 model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
 model:add(nn.ReLU())
