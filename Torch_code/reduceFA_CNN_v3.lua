@@ -30,7 +30,7 @@ cmd:option('-nFeatures_m1', 500)
 cmd:option('-lambda', 1)
 cmd:option('-beta', 1)
 -- Experiment Setting
-cmd:option('-seed', 1)
+cmd:option('-seed', 11)
 cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
 cmd:option('-maxIter', 50)
