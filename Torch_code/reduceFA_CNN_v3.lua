@@ -20,10 +20,10 @@ cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 1)
 cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures1', 16)
-cmd:option('-nFeatures2', 64)
+cmd:option('-nFeatures1', 50)
+cmd:option('-nFeatures2', 50)
 --- For MLP
-cmd:option('-nFeatures3', 1024)
+cmd:option('-nFeatures3', 500)
 --- For PSD
 cmd:option('-lambda', 1)
 cmd:option('-beta', 1)
