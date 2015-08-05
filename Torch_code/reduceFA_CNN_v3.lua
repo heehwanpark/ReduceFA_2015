@@ -43,7 +43,7 @@ cmd:option('-pretraining', false)
 cmd:option('-kernel', 10)
 cmd:option('-pool', 4)
 -- Torch Setting
-cmd:option('-thread', 8)
+cmd:option('-thread', 16)
 
 cmd:text()
 option = cmd:parse(arg)
@@ -56,7 +56,6 @@ torch.setnumthreads(option.thread)
 print '==> Load datasets'
 
 require 'hdf5'
-
 mit_datafile = hdf5.open(option.mitdata, 'r')
 mit_labelset_input = mit_datafile:read('/inputs'):all()
 mit_labelset_target = mit_datafile:read('/targets'):all()
@@ -129,23 +128,20 @@ if option.pretraining then
 end
 
 model:cuda()
-
 print(model)
-
 ----------------------------------------------------------------------
 print '==> Defining loss'
 
--- weight = torch.Tensor(2)
--- weight[1] = 0.15
--- weight[2] = 0.85
--- criterion = nn.ClassNLLCriterion(weight)
-criterion = nn.ClassNLLCriterion()
+weight = torch.Tensor(2)
+weight[1] = 0.6
+weight[2] = 0.4
+criterion = nn.ClassNLLCriterion(weight)
+-- criterion = nn.ClassNLLCriterion()
 criterion:cuda()
 ----------------------------------------------------------------------
 print '==> Defining some tools'
 
 classes = {'Normal','Abnormal'}
-
 confusion = optim.ConfusionMatrix(classes)
 ----------------------------------------------------------------------
 print '==> configuring optimizer'
@@ -156,14 +152,13 @@ optimState = {
   learningRateDecay = option.lrdecay
 }
 optimMethod = optim.sgd
-
 ----------------------------------------------------------------------
 print '==> Defining training procedure'
+-- reset randseed
+torch.manualSeed(option.seed)
 
 parameters, gradParameters = model:getParameters()
-
 batchsize = option.batchsize
-
 nFold = option.nFold
 ----------------------------------------------------------------------
 -- Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
