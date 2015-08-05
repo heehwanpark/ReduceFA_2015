@@ -20,10 +20,10 @@ cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 1)
 cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures_c1', 50)
-cmd:option('-nFeatures_c2', 50)
-cmd:option('-nFeatures_c3', 50)
-cmd:option('-nFeatures_c4', 50)
+cmd:option('-nFeatures_c1', 55)
+cmd:option('-nFeatures_c2', 55)
+cmd:option('-nFeatures_c3', 55)
+cmd:option('-nFeatures_c4', 55)
 --- For MLP
 cmd:option('-nFeatures_m1', 500)
 --- For PSD
@@ -148,14 +148,14 @@ print '==> configuring optimizer'
 optimState = {
   learningRate = option.lr_sup,
   weightDecay = 0,
-  momentum = 0,
+  momentum = option.momentum,
   learningRateDecay = option.lrdecay
 }
 optimMethod = optim.sgd
 ----------------------------------------------------------------------
 print '==> Defining training procedure'
 -- reset randseed
-torch.manualSeed(option.seed)
+torch.manualSeed(1)
 
 parameters, gradParameters = model:getParameters()
 batchsize = option.batchsize
