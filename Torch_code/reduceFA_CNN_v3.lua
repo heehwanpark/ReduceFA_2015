@@ -31,7 +31,7 @@ cmd:option('-lambda', 1)
 cmd:option('-beta', 1)
 -- Experiment Setting
 cmd:option('-seed', 1)
-cmd:option('-batchsize', 10)
+cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
 cmd:option('-maxIter', 100)
 cmd:option('-lr_sup', 0.005, 'Learning rate')
@@ -45,7 +45,7 @@ cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0805_result_1')
+cmd:option('-filename', '0805_result_3')
 
 cmd:text()
 option = cmd:parse(arg)
