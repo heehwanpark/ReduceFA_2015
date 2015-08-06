@@ -60,7 +60,8 @@ torch.manualSeed(option.seed)
 torch.setnumthreads(option.thread)
 ----------------------------------------------------------------------
 print '==> Load datasets'
-
+print(option.datatype)
+print(type(option.datatype))
 require 'hdf5'
 if option.datatype == 'mitbih'  then
   mit_datafile = hdf5.open(option.mitdata, 'r')
