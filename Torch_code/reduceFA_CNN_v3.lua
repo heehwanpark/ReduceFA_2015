@@ -45,7 +45,7 @@ cmd:option('-momentum', 0)
 cmd:option('-pretraining', false)
 -- Conv Setting
 cmd:option('-kernel', 10)
-cmd:option('-pool', 4)
+cmd:option('-pool', 3)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
