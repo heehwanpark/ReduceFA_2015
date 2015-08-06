@@ -29,7 +29,7 @@ function trainConvPSD(pretrainset, nInputFeature, nOutputFeature, option, filena
 
   sgdconf = {learningRate = option.lr_unsup}
 
-  Maxiter = 10
+  Maxiter = 1
   local count = 1
 
   while count <= Maxiter do
