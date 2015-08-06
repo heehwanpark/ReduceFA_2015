@@ -21,10 +21,14 @@ function convertForPretrain(dataset, inputSize)
 end
 
 function netsThrough(model, dataset)
+  print 'WoW'
   N = table.getn(dataset)
+  print('hi')
+  print(N)
   outputs = {}
   for i = 1, N do
     input = dataset[i]
+    print(input:size())
     -- input = torch.reshape(input, 1, input:size(), 1)
     output = model:forward(input)
     table.insert(outputs, output)
