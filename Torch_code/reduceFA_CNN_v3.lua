@@ -13,6 +13,7 @@ cmd:text('Options:')
 -- Data
 cmd:option('-chaldata', '/home/salab/Documents/workspace/data/ReduceFA/chal2015_data_10sec_resampled.h5')
 cmd:option('-mitdata', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
+cmd:option('-datatype,' 'chal-2015') -- chal-2015, mitbih, mit+chal
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
@@ -24,7 +25,9 @@ cmd:option('-nFeatures_c1', 60)
 cmd:option('-nFeatures_c2', 60)
 cmd:option('-nFeatures_c3', 60)
 cmd:option('-nFeatures_c4', 60)
--- cmd:option('-nFeatures_c5', 60)
+cmd:option('-nFeatures_c5', 60)
+cmd:option('-nFeatures_c6', 60)
+cmd:option('-nFeatures_c7', 60)
 --- For MLP
 cmd:option('-nFeatures_m1', 500)
 --- For PSD
@@ -42,11 +45,11 @@ cmd:option('-momentum', 0)
 cmd:option('-pretraining', false)
 -- Conv Setting
 cmd:option('-kernel', 10)
-cmd:option('-pool', 3)
+cmd:option('-pool', 2)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_result_2')
+cmd:option('-filename', '0806_2')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -59,20 +62,37 @@ torch.setnumthreads(option.thread)
 print '==> Load datasets'
 
 require 'hdf5'
--- mit_datafile = hdf5.open(option.mitdata, 'r')
--- mit_labelset_input = mit_datafile:read('/inputs'):all()
--- mit_labelset_target = mit_datafile:read('/targets'):all()
--- mit_datafile:close()
+if option.datatype == 'mitbih'  then
+  mit_datafile = hdf5.open(option.mitdata, 'r')
+  mit_labelset_input = mit_datafile:read('/inputs'):all()
+  mit_labelset_target = mit_datafile:read('/targets'):all()
+  mit_datafile:close()
+elseif option.datatype == 'chal-2015' then
+  chal_datafile = hdf5.open(option.chaldata, 'r')
+  chal_pretrainset = chal_datafile:read('/pretrain'):all()
+  chal_labelset_input = chal_datafile:read('/input'):all()
+  chal_labelset_target = chal_datafile:read('/target'):all()
+  chal_datafile:close()
 
-chal_datafile = hdf5.open(option.chaldata, 'r')
--- chal_pretrainset = chal_datafile:read('/pretrain'):all()
-chal_labelset_input = chal_datafile:read('/input'):all()
-chal_labelset_target = chal_datafile:read('/target'):all()
-chal_datafile:close()
+  chal_pretrainset = chal_pretrainset:transpose(1,2)
+  chal_labelset_input = chal_labelset_input:transpose(1,2)
+  chal_labelset_target = chal_labelset_target:transpose(1,2)
+elseif option.datatype == 'mit+chal' then
+  mit_datafile = hdf5.open(option.mitdata, 'r')
+  mit_labelset_input = mit_datafile:read('/inputs'):all()
+  mit_labelset_target = mit_datafile:read('/targets'):all()
+  mit_datafile:close()
 
--- chal_pretrainset = chal_pretrainset:transpose(1,2)
-chal_labelset_input = chal_labelset_input:transpose(1,2)
-chal_labelset_target = chal_labelset_target:transpose(1,2)
+  chal_datafile = hdf5.open(option.chaldata, 'r')
+  chal_pretrainset = chal_datafile:read('/pretrain'):all()
+  chal_labelset_input = chal_datafile:read('/input'):all()
+  chal_labelset_target = chal_datafile:read('/target'):all()
+  chal_datafile:close()
+
+  chal_pretrainset = chal_pretrainset:transpose(1,2)
+  chal_labelset_input = chal_labelset_input:transpose(1,2)
+  chal_labelset_target = chal_labelset_target:transpose(1,2)
+end
 ----------------------------------------------------------------------
 if option.pretraining then
   print '==> Set pretraining'
@@ -138,17 +158,33 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 -- Calculate # of outputs
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
--- -- 5th convolution layer
--- model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
--- model:add(nn.ReLU())
--- model:add(nn.SpatialMaxPooling(1, option.pool))
---
--- -- Calculate # of outputs
--- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+-- 5th convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
+
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+
+-- 6th convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c5, option.nFeatures_c6, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
+
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+
+-- 7th convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c6, option.nFeatures_c7, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
+
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- Standard MLP
-model:add(nn.View(option.nFeatures_c4*nConvOut*1))
-model:add(nn.Linear(option.nFeatures_c4*nConvOut*1, option.nFeatures_m1))
+model:add(nn.View(option.nFeatures_c7*nConvOut*1))
+model:add(nn.Linear(option.nFeatures_c7*nConvOut*1, option.nFeatures_m1))
 model:add(nn.ReLU())
 model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
 model:add(nn.ReLU())
@@ -194,104 +230,106 @@ torch.manualSeed(1)
 parameters, gradParameters = model:getParameters()
 batchsize = option.batchsize
 nFold = option.nFold
-----------------------------------------------------------------------
+
+if option.datatype == 'mitbih' then
 -- Training & Testing: MIT-BIH
+  nElement = mit_labelset_target:size(1)
+  nTraining = nElement - math.floor(nElement/nFold)
+  nTesting = nElement - nTraining
 
--- nElement = mit_labelset_target:size(1)
--- nTraining = nElement - math.floor(nElement/nFold)
--- nTesting = nElement - nTraining
---
--- shuffle = torch.randperm(nElement)
---
--- trainset_input = torch.zeros(nTraining, option.inputSize)
--- trainset_target = torch.zeros(nTraining, 1)
--- for i = 1, nTraining do
---   trainset_input[{i, {}}] = mit_labelset_input[{shuffle[i], {}}]
---   trainset_target[i] = mit_labelset_target[shuffle[i]]
--- end
---
--- testset_input = torch.zeros(nTesting, option.inputSize)
--- testset_target = torch.zeros(nTesting, 1)
--- for j = 1, nTesting do
---   testset_input[{j, {}}] = mit_labelset_input[{shuffle[j+nTraining], {}}]
---   testset_target[j] = mit_labelset_target[shuffle[j+nTraining]]
--- end
-----------------------------------------------------------------------
+  shuffle = torch.randperm(nElement)
+
+  trainset_input = torch.zeros(nTraining, option.inputSize)
+  trainset_target = torch.zeros(nTraining, 1)
+  for i = 1, nTraining do
+    trainset_input[{i, {}}] = mit_labelset_input[{shuffle[i], {}}]
+    trainset_target[i] = mit_labelset_target[shuffle[i]]
+  end
+
+  testset_input = torch.zeros(nTesting, option.inputSize)
+  testset_target = torch.zeros(nTesting, 1)
+  for j = 1, nTesting do
+    testset_input[{j, {}}] = mit_labelset_input[{shuffle[j+nTraining], {}}]
+    testset_target[j] = mit_labelset_target[shuffle[j+nTraining]]
+  end
+elseif option.datatype == 'mit+chal' then
 -- Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
+  nMitSamples = mit_labelset_target:size(1)
+  nChalSamples = chal_labelset_target:size(1)
+  nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
+  nChalTest = nChalSamples - nChalTrain
 
--- nMitSamples = mit_labelset_target:size(1)
--- nChalSamples = chal_labelset_target:size(1)
--- nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
--- nChalTest = nChalSamples - nChalTrain
---
--- Chal_shuffle = torch.randperm(nChalSamples)
---
--- chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
--- chal_trainset_target = torch.zeros(nChalTrain, 1)
--- for i = 1, nChalTrain do
---   chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
---   chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
--- end
---
--- chal_testset_input = torch.zeros(nChalTest, option.inputSize)
--- chal_testset_target = torch.zeros(nChalTest, 1)
--- for j = 1, nChalTest do
---   chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
---   chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
--- end
---
--- nTraining = nMitSamples + nChalTrain
--- nTesting = nChalTest
--- nElement = nTraining + nTesting
---
--- trainset_input = torch.zeros(nTraining, option.inputSize)
--- trainset_target = torch.zeros(nTraining, 1)
---
--- for i = 1, nMitSamples do
---   trainset_input[{i, {}}] = mit_labelset_input[{i, {}}]
---   trainset_target[i] = mit_labelset_target[i]
--- end
---
--- for i = 1, nChalTrain do
---   trainset_input[{nMitSamples+i, {}}] = chal_trainset_input[{i, {}}]
---   trainset_target[nMitSamples+i] = chal_trainset_target[i]
--- end
---
--- testset_input = chal_testset_input
--- testset_target = chal_testset_target
-----------------------------------------------------------------------
--- Training & Testing: Chal-2015 last 10sec
+  Chal_shuffle = torch.randperm(nChalSamples)
 
-nChalSamples = chal_labelset_target:size(1)
-nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
-nChalTest = nChalSamples - nChalTrain
+  chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
+  chal_trainset_target = torch.zeros(nChalTrain, 1)
+  for i = 1, nChalTrain do
+    chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
+    chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
+  end
 
-Chal_shuffle = torch.randperm(nChalSamples)
+  chal_testset_input = torch.zeros(nChalTest, option.inputSize)
+  chal_testset_target = torch.zeros(nChalTest, 1)
+  for j = 1, nChalTest do
+    chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
+    chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
+  end
 
-chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
-chal_trainset_target = torch.zeros(nChalTrain, 1)
-for i = 1, nChalTrain do
-  chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
-  chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
+  nTraining = nMitSamples + nChalTrain
+  nTesting = nChalTest
+  nElement = nTraining + nTesting
+
+  trainset_input = torch.zeros(nTraining, option.inputSize)
+  trainset_target = torch.zeros(nTraining, 1)
+
+  for i = 1, nMitSamples do
+    trainset_input[{i, {}}] = mit_labelset_input[{i, {}}]
+    trainset_target[i] = mit_labelset_target[i]
+  end
+
+  for i = 1, nChalTrain do
+    trainset_input[{nMitSamples+i, {}}] = chal_trainset_input[{i, {}}]
+    trainset_target[nMitSamples+i] = chal_trainset_target[i]
+  end
+
+  testset_input = chal_testset_input
+  testset_target = chal_testset_target
+elseif option.datatype = 'chal-2015' then
+  -- Training & Testing: Chal-2015 last 10sec
+  nChalSamples = chal_labelset_target:size(1)
+  nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
+  nChalTest = nChalSamples - nChalTrain
+
+  Chal_shuffle = torch.randperm(nChalSamples)
+
+  chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
+  chal_trainset_target = torch.zeros(nChalTrain, 1)
+  for i = 1, nChalTrain do
+    chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
+    chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
+  end
+
+  chal_testset_input = torch.zeros(nChalTest, option.inputSize)
+  chal_testset_target = torch.zeros(nChalTest, 1)
+  for j = 1, nChalTest do
+    chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
+    chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
+  end
+
+  nTraining = nChalTrain
+  nTesting = nChalTest
+  nElement = nChalSamples
+
+  trainset_input = chal_trainset_input
+  trainset_target = chal_trainset_target
+
+  testset_input = chal_testset_input
+  testset_target = chal_testset_target
+else
+  print '==> datatype error!!'
+  break
 end
 
-chal_testset_input = torch.zeros(nChalTest, option.inputSize)
-chal_testset_target = torch.zeros(nChalTest, 1)
-for j = 1, nChalTest do
-  chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
-  chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
-end
-
-nTraining = nChalTrain
-nTesting = nChalTest
-nElement = nChalSamples
-
-trainset_input = chal_trainset_input
-trainset_target = chal_trainset_target
-
-testset_input = chal_testset_input
-testset_target = chal_testset_target
-----------------------------------------------------------------------
 print(trainset_input:size())
 print(testset_input:size())
 
@@ -426,9 +464,9 @@ end
 
 folder = '/home/salab/Documents/workspace/data/ReduceFA/output/'
 if option.pretraining then
-  recordfile = hdf5.open(folder .. option.filename .. '_wi_pre.h5', 'w')
+  recordfile = hdf5.open(folder .. option.filename .. '_' .. option.datatype .. '_wi_pre.h5', 'w')
 else
-  recordfile = hdf5.open(folder .. option.filename .. '_wo_pre.h5', 'w')
+  recordfile = hdf5.open(folder .. option.filename .. '_' .. option.datatype ..'_wo_pre.h5', 'w')
 end
 recordfile:write('/train_accu', result_train_accu)
 recordfile:write('/train_err', result_train_err)
