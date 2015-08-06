@@ -38,7 +38,7 @@ cmd:option('-lr_sup', 0.005, 'Learning rate')
 cmd:option('-lr_unsup', 5e-6, 'Learning rate')
 cmd:option('-lrdecay',1e-5, 'Learning rate decay')
 cmd:option('-momentum', 0)
-cmd:option('-pretraining', false)
+cmd:option('-pretraining', true)
 -- Conv Setting
 cmd:option('-kernel', 10)
 cmd:option('-pool', 4)
@@ -78,6 +78,7 @@ if option.pretraining then
   require 'unsup'
   require 'ConvPSD_HH'
 
+  print '...Pre-training 1st layer'
   -- 1st layer
   pretrainset1 = convertForPretrain(chal_pretrainset, option.inputSize)
   -- encoder1, decoder1 = trainConvPSD(pretrainset1, option.nInputFeature, option.nFeatures_c1, option, 'pretrain_result_layer1')
@@ -90,6 +91,7 @@ if option.pretraining then
   model_1:add(nn.SpatialMaxPooling(1, option.pool))
   model_1.modules[1].weight = encoder1.modules[1].weight
 
+  print '...Pre-training 2nd layer'
   -- 2nd layer
   pretrainset2 = netsThrough(model_1, pretrainset1)
   encoder2, decoder2 = trainConvPSD(pretrainset2, option.nFeatures1, option.nFeatures2, option, 'pretrain_result_layer2')
