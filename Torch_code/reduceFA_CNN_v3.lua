@@ -46,7 +46,7 @@ cmd:option('-pool', 3)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_result_1')
+cmd:option('-filename', '0806_result_2')
 
 cmd:text()
 option = cmd:parse(arg)
