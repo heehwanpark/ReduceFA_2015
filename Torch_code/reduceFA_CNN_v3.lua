@@ -13,7 +13,7 @@ cmd:text('Options:')
 -- Data
 cmd:option('-chaldata', '/home/salab/Documents/workspace/data/ReduceFA/chal2015_data_10sec_resampled.h5')
 cmd:option('-mitdata', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
-cmd:option('-datatype,' 'chal-2015') -- chal-2015, mitbih, mit+chal
+cmd:option('-datatype,', 'chal-2015') -- chal-2015, mitbih, mit+chal
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
@@ -49,7 +49,7 @@ cmd:option('-pool', 2)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_2')
+cmd:option('-filename', '0806_c7_p2')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -294,7 +294,7 @@ elseif option.datatype == 'mit+chal' then
 
   testset_input = chal_testset_input
   testset_target = chal_testset_target
-elseif option.datatype = 'chal-2015' then
+elseif option.datatype == 'chal-2015' then
   -- Training & Testing: Chal-2015 last 10sec
   nChalSamples = chal_labelset_target:size(1)
   nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
@@ -327,7 +327,6 @@ elseif option.datatype = 'chal-2015' then
   testset_target = chal_testset_target
 else
   print '==> datatype error!!'
-  break
 end
 
 print(trainset_input:size())
