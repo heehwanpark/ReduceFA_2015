@@ -49,7 +49,7 @@ cmd:option('-pool', 2)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_c7_p2')
+cmd:option('-filename', '0806_c6_p2')
 
 cmd:text()
 option = cmd:parse(arg)
