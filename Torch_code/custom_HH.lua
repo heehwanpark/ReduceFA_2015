@@ -21,10 +21,8 @@ function convertForPretrain(dataset, inputSize)
 end
 
 function netsThrough(model, dataset)
-  print 'WoW'
+  print(dataset:size())
   N = table.getn(dataset)
-  print('hi')
-  print(N)
   outputs = {}
   for i = 1, N do
     input = dataset[i]
