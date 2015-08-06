@@ -45,11 +45,11 @@ cmd:option('-momentum', 0)
 cmd:option('-pretraining', false)
 -- Conv Setting
 cmd:option('-kernel', 10)
-cmd:option('-pool', 3)
+cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_c4_p3')
+cmd:option('-filename', '0806_c4_p4')
 
 cmd:text()
 option = cmd:parse(arg)
