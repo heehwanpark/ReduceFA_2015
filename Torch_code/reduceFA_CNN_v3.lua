@@ -13,7 +13,7 @@ cmd:text('Options:')
 -- Data
 cmd:option('-chaldata', '/home/salab/Documents/workspace/data/ReduceFA/chal2015_data_10sec_resampled.h5')
 cmd:option('-mitdata', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
-cmd:option('-datatype', 'chal-2015') -- chal-2015, mitbih, mit+chal
+cmd:option('-datatype', 'mitbih') -- chal-2015, mitbih, mit+chal
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
