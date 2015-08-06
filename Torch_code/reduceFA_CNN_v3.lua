@@ -78,15 +78,21 @@ if option.pretraining then
   require 'unsup'
   require 'ConvPSD_HH'
 
-  pretrainset1 = convertForPretrain(chal_pretrainset, option.inputSize)
-
   -- 1st layer
-  encoder1, decoder1 = trainConvPSD(pretrainset1, option.nInputFeature, option.nFeatures_c1, option, 'pretrain_result_layer1')
-  -- encoder1 = torch.load('pretrain_result_layer1_encoder.net')
-  -- decoder1 = torch.load('pretrain_result_layer1_decoder.net')
-  -- pretrainset2 = netsThrough(encoder1, pretrainset1)
-  -- -- 2nd layer
-  -- encoder2, decoder2 = trainConvPSD(pretrainset2, option.nFeatures1, option.nFeatures2, option, 'pretrain_result_layer2')
+  pretrainset1 = convertForPretrain(chal_pretrainset, option.inputSize)
+  -- encoder1, decoder1 = trainConvPSD(pretrainset1, option.nInputFeature, option.nFeatures_c1, option, 'pretrain_result_layer1')
+  encoder1 = torch.load('pretrain_result_layer1_encoder.net')
+  decoder1 = torch.load('pretrain_result_layer1_decoder.net')
+
+  model_1 = nn.Sequential()
+  model_1:add(nn.SpatialConvolutionMM(option.nInputFeature, option.nFeatures_c1, 1, option.kernel))
+  model_1:add(nn.ReLU())
+  model_1:add(nn.SpatialMaxPooling(1, option.pool))
+  model_1.modules[1].weight = encoder1.modules[1].weight
+
+  -- 2nd layer
+  pretrainset2 = netsThrough(model_1, pretrainset1)
+  encoder2, decoder2 = trainConvPSD(pretrainset2, option.nFeatures1, option.nFeatures2, option, 'pretrain_result_layer2')
 end
 ----------------------------------------------------------------------
 require 'cutorch'
