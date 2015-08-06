@@ -37,7 +37,7 @@ cmd:option('-beta', 1)
 cmd:option('-seed', 1)
 cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
-cmd:option('-maxIter', 200)
+cmd:option('-maxIter', 100)
 cmd:option('-lr_sup', 0.005, 'Learning rate')
 cmd:option('-lr_unsup', 5e-6, 'Learning rate')
 cmd:option('-lrdecay',1e-5, 'Learning rate decay')
@@ -49,7 +49,7 @@ cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_c4_p4')
+cmd:option('-filename', '0806_comp_c4_p4')
 
 cmd:text()
 option = cmd:parse(arg)
