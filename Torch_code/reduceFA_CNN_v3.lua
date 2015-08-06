@@ -25,9 +25,9 @@ cmd:option('-nFeatures_c1', 60)
 cmd:option('-nFeatures_c2', 60)
 cmd:option('-nFeatures_c3', 60)
 cmd:option('-nFeatures_c4', 60)
-cmd:option('-nFeatures_c5', 60)
-cmd:option('-nFeatures_c6', 60)
-cmd:option('-nFeatures_c7', 60)
+-- cmd:option('-nFeatures_c5', 60)
+-- cmd:option('-nFeatures_c6', 60)
+-- cmd:option('-nFeatures_c7', 60)
 --- For MLP
 cmd:option('-nFeatures_m1', 500)
 --- For PSD
@@ -37,7 +37,7 @@ cmd:option('-beta', 1)
 cmd:option('-seed', 1)
 cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
-cmd:option('-maxIter', 200)
+cmd:option('-maxIter', 100)
 cmd:option('-lr_sup', 0.005, 'Learning rate')
 cmd:option('-lr_unsup', 5e-6, 'Learning rate')
 cmd:option('-lrdecay',1e-5, 'Learning rate decay')
@@ -45,11 +45,11 @@ cmd:option('-momentum', 0)
 cmd:option('-pretraining', false)
 -- Conv Setting
 cmd:option('-kernel', 10)
-cmd:option('-pool', 2)
+cmd:option('-pool', 3)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_c7_p2')
+cmd:option('-filename', '0806_c4_p3')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -160,33 +160,33 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 -- Calculate # of outputs
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
--- 5th convolution layer
-model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
-model:add(nn.ReLU())
-model:add(nn.SpatialMaxPooling(1, option.pool))
+-- -- 5th convolution layer
+-- model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
+-- model:add(nn.ReLU())
+-- model:add(nn.SpatialMaxPooling(1, option.pool))
+--
+-- -- Calculate # of outputs
+-- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
--- Calculate # of outputs
-nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+-- -- 6th convolution layer
+-- model:add(nn.SpatialConvolutionMM(option.nFeatures_c5, option.nFeatures_c6, 1, option.kernel))
+-- model:add(nn.ReLU())
+-- model:add(nn.SpatialMaxPooling(1, option.pool))
+--
+-- -- Calculate # of outputs
+-- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
--- 6th convolution layer
-model:add(nn.SpatialConvolutionMM(option.nFeatures_c5, option.nFeatures_c6, 1, option.kernel))
-model:add(nn.ReLU())
-model:add(nn.SpatialMaxPooling(1, option.pool))
-
--- Calculate # of outputs
-nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
-
--- 7th convolution layer
-model:add(nn.SpatialConvolutionMM(option.nFeatures_c6, option.nFeatures_c7, 1, option.kernel))
-model:add(nn.ReLU())
-model:add(nn.SpatialMaxPooling(1, option.pool))
-
--- Calculate # of outputs
-nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+-- -- 7th convolution layer
+-- model:add(nn.SpatialConvolutionMM(option.nFeatures_c6, option.nFeatures_c7, 1, option.kernel))
+-- model:add(nn.ReLU())
+-- model:add(nn.SpatialMaxPooling(1, option.pool))
+--
+-- -- Calculate # of outputs
+-- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- Standard MLP
-model:add(nn.View(option.nFeatures_c7*nConvOut*1))
-model:add(nn.Linear(option.nFeatures_c7*nConvOut*1, option.nFeatures_m1))
+model:add(nn.View(option.nFeatures_c4*nConvOut*1))
+model:add(nn.Linear(option.nFeatures_c4*nConvOut*1, option.nFeatures_m1))
 model:add(nn.ReLU())
 model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
 model:add(nn.ReLU())
