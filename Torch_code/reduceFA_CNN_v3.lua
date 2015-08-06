@@ -38,14 +38,14 @@ cmd:option('-lr_sup', 0.005, 'Learning rate')
 cmd:option('-lr_unsup', 5e-6, 'Learning rate')
 cmd:option('-lrdecay',1e-5, 'Learning rate decay')
 cmd:option('-momentum', 0)
-cmd:option('-pretraining', true)
+cmd:option('-pretraining', false)
 -- Conv Setting
 cmd:option('-kernel', 10)
 cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0805_result_3')
+cmd:option('-filename', '0806_result_1')
 
 cmd:text()
 option = cmd:parse(arg)
