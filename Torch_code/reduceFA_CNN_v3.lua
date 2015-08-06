@@ -92,6 +92,8 @@ elseif option.datatype == 'mit+chal' then
   chal_pretrainset = chal_pretrainset:transpose(1,2)
   chal_labelset_input = chal_labelset_input:transpose(1,2)
   chal_labelset_target = chal_labelset_target:transpose(1,2)
+else
+  error('==> datatype error!!')
 end
 ----------------------------------------------------------------------
 if option.pretraining then
@@ -252,6 +254,7 @@ if option.datatype == 'mitbih' then
     testset_input[{j, {}}] = mit_labelset_input[{shuffle[j+nTraining], {}}]
     testset_target[j] = mit_labelset_target[shuffle[j+nTraining]]
   end
+
 elseif option.datatype == 'mit+chal' then
 -- Training: MIT-BIH + Chal-2015 pretraining, Testing: Chal-2015 last 10sec
   nMitSamples = mit_labelset_target:size(1)
@@ -294,6 +297,7 @@ elseif option.datatype == 'mit+chal' then
 
   testset_input = chal_testset_input
   testset_target = chal_testset_target
+
 elseif option.datatype == 'chal-2015' then
   -- Training & Testing: Chal-2015 last 10sec
   nChalSamples = chal_labelset_target:size(1)
@@ -325,8 +329,9 @@ elseif option.datatype == 'chal-2015' then
 
   testset_input = chal_testset_input
   testset_target = chal_testset_target
+
 else
-  print '==> datatype error!!'
+  error('==> datatype error!!')
 end
 
 print(trainset_input:size())
