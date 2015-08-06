@@ -24,7 +24,7 @@ cmd:option('-nFeatures_c1', 60)
 cmd:option('-nFeatures_c2', 60)
 cmd:option('-nFeatures_c3', 60)
 cmd:option('-nFeatures_c4', 60)
-cmd:option('-nFeatures_c5', 60)
+-- cmd:option('-nFeatures_c5', 60)
 --- For MLP
 cmd:option('-nFeatures_m1', 500)
 --- For PSD
@@ -59,18 +59,18 @@ torch.setnumthreads(option.thread)
 print '==> Load datasets'
 
 require 'hdf5'
-mit_datafile = hdf5.open(option.mitdata, 'r')
-mit_labelset_input = mit_datafile:read('/inputs'):all()
-mit_labelset_target = mit_datafile:read('/targets'):all()
-mit_datafile:close()
+-- mit_datafile = hdf5.open(option.mitdata, 'r')
+-- mit_labelset_input = mit_datafile:read('/inputs'):all()
+-- mit_labelset_target = mit_datafile:read('/targets'):all()
+-- mit_datafile:close()
 
 chal_datafile = hdf5.open(option.chaldata, 'r')
-chal_pretrainset = chal_datafile:read('/pretrain'):all()
+-- chal_pretrainset = chal_datafile:read('/pretrain'):all()
 chal_labelset_input = chal_datafile:read('/input'):all()
 chal_labelset_target = chal_datafile:read('/target'):all()
 chal_datafile:close()
 
-chal_pretrainset = chal_pretrainset:transpose(1,2)
+-- chal_pretrainset = chal_pretrainset:transpose(1,2)
 chal_labelset_input = chal_labelset_input:transpose(1,2)
 chal_labelset_target = chal_labelset_target:transpose(1,2)
 ----------------------------------------------------------------------
@@ -138,13 +138,13 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 -- Calculate # of outputs
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
--- 5th convolution layer
-model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
-model:add(nn.ReLU())
-model:add(nn.SpatialMaxPooling(1, option.pool))
-
--- Calculate # of outputs
-nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+-- -- 5th convolution layer
+-- model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
+-- model:add(nn.ReLU())
+-- model:add(nn.SpatialMaxPooling(1, option.pool))
+--
+-- -- Calculate # of outputs
+-- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- Standard MLP
 model:add(nn.View(option.nFeatures_c4*nConvOut*1))
