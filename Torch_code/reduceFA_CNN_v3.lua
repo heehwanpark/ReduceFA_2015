@@ -262,20 +262,20 @@ elseif option.datatype == 'mit+chal' then
   nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
   nChalTest = nChalSamples - nChalTrain
 
-  Chal_shuffle = torch.randperm(nChalSamples)
+  shuffle = torch.randperm(nChalSamples)
 
   chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
   chal_trainset_target = torch.zeros(nChalTrain, 1)
   for i = 1, nChalTrain do
-    chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
-    chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
+    chal_trainset_input[{i, {}}] = chal_labelset_input[{shuffle[i], {}}]
+    chal_trainset_target[i] = chal_labelset_target[shuffle[i]]
   end
 
   chal_testset_input = torch.zeros(nChalTest, option.inputSize)
   chal_testset_target = torch.zeros(nChalTest, 1)
   for j = 1, nChalTest do
-    chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
-    chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
+    chal_testset_input[{j, {}}] = chal_labelset_input[{shuffle[j+nChalTrain], {}}]
+    chal_testset_target[j] = chal_labelset_target[shuffle[j+nChalTrain]]
   end
 
   nTraining = nMitSamples + nChalTrain
@@ -304,20 +304,20 @@ elseif option.datatype == 'chal-2015' then
   nChalTrain = nChalSamples - math.floor(nChalSamples/nFold)
   nChalTest = nChalSamples - nChalTrain
 
-  Chal_shuffle = torch.randperm(nChalSamples)
+  shuffle = torch.randperm(nChalSamples)
 
   chal_trainset_input = torch.zeros(nChalTrain, option.inputSize)
   chal_trainset_target = torch.zeros(nChalTrain, 1)
   for i = 1, nChalTrain do
-    chal_trainset_input[{i, {}}] = chal_labelset_input[{Chal_shuffle[i], {}}]
-    chal_trainset_target[i] = chal_labelset_target[Chal_shuffle[i]]
+    chal_trainset_input[{i, {}}] = chal_labelset_input[{shuffle[i], {}}]
+    chal_trainset_target[i] = chal_labelset_target[shuffle[i]]
   end
 
   chal_testset_input = torch.zeros(nChalTest, option.inputSize)
   chal_testset_target = torch.zeros(nChalTest, 1)
   for j = 1, nChalTest do
-    chal_testset_input[{j, {}}] = chal_labelset_input[{Chal_shuffle[j+nChalTrain], {}}]
-    chal_testset_target[j] = chal_labelset_target[Chal_shuffle[j+nChalTrain]]
+    chal_testset_input[{j, {}}] = chal_labelset_input[{shuffle[j+nChalTrain], {}}]
+    chal_testset_target[j] = chal_labelset_target[shuffle[j+nChalTrain]]
   end
 
   nTraining = nChalTrain
