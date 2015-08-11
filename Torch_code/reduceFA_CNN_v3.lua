@@ -23,8 +23,8 @@ cmd:option('-inputSize', 3600) -- 360Hz * 10sec
 --- For convolutional networks
 cmd:option('-nFeatures_c1', 60)
 cmd:option('-nFeatures_c2', 60)
--- cmd:option('-nFeatures_c3', 60)
--- cmd:option('-nFeatures_c4', 60)
+cmd:option('-nFeatures_c3', 60)
+cmd:option('-nFeatures_c4', 60)
 -- cmd:option('-nFeatures_c5', 60)
 -- cmd:option('-nFeatures_c6', 60)
 -- cmd:option('-nFeatures_c7', 60)
@@ -144,21 +144,21 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 -- Calculate # of outputs
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
--- -- 3rd convolution layer
--- model:add(nn.SpatialConvolutionMM(option.nFeatures_c2, option.nFeatures_c3, 1, option.kernel))
--- model:add(nn.ReLU())
--- model:add(nn.SpatialMaxPooling(1, option.pool))
---
--- -- Calculate # of outputs
--- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+-- 3rd convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c2, option.nFeatures_c3, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
 
--- -- 4th convolution layer
--- model:add(nn.SpatialConvolutionMM(option.nFeatures_c3, option.nFeatures_c4, 1, option.kernel))
--- model:add(nn.ReLU())
--- model:add(nn.SpatialMaxPooling(1, option.pool))
---
--- -- Calculate # of outputs
--- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
+
+-- 4th convolution layer
+model:add(nn.SpatialConvolutionMM(option.nFeatures_c3, option.nFeatures_c4, 1, option.kernel))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(1, option.pool))
+
+-- Calculate # of outputs
+nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- -- 5th convolution layer
 -- model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
@@ -185,8 +185,8 @@ nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 -- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- Standard MLP
-model:add(nn.View(option.nFeatures_c2*nConvOut*1))
-model:add(nn.Linear(option.nFeatures_c2*nConvOut*1, option.nFeatures_m1))
+model:add(nn.View(option.nFeatures_c4*nConvOut*1))
+model:add(nn.Linear(option.nFeatures_c4*nConvOut*1, option.nFeatures_m1))
 model:add(nn.ReLU())
 model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
 model:add(nn.ReLU())
@@ -434,14 +434,14 @@ function test()
     end
   end
 
-  -- if test_count == Maxiter then
-  --   print(shuffle[{{nTraining+1, nElement}}]:size())
-  --   print(acc_list:size())
-  --   l = torch.cat(shuffle[{{nTraining+1, nElement}}], acc_list, 2)
-  --   faultfile = hdf5.open('/home/heehwan/faultfile.h5', 'w')
-  --   faultfile:write('/list', l)
-  --   faultfile:close()
-  -- end
+  if test_count == Maxiter then
+    print(shuffle[{{nTraining+1, nElement}}]:size())
+    print(acc_list:size())
+    l = torch.cat(shuffle[{{nTraining+1, nElement}}], acc_list, 2)
+    faultfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output//faultfile.h5', 'w')
+    faultfile:write('/list', l)
+    faultfile:close()
+  end
 
   time = sys.clock() - time
   time = time / nTesting
