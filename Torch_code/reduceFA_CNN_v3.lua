@@ -341,6 +341,7 @@ elseif option.datatype == 'chal-2015' then
 
   testset_input = chal_testset_input
   testset_target = chal_testset_target
+
 elseif option.datatype == 'mitdb' then
   nTraining = mitdb_tr_target:size(1)
   nTesting = mitdb_te_target:size(1)
