@@ -456,14 +456,14 @@ function test()
     end
   end
 
-  if test_count == Maxiter then
-    print(shuffle[{{nTraining+1, nElement}}]:size())
-    print(acc_list:size())
-    l = torch.cat(shuffle[{{nTraining+1, nElement}}], acc_list, 2)
-    faultfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/faultfile.h5', 'w')
-    faultfile:write('/list', l)
-    faultfile:close()
-  end
+  -- if test_count == Maxiter then
+  --   print(shuffle_t[{{nTraining+1, nElement}}]:size())
+  --   print(acc_list:size())
+  --   l = torch.cat(shuffle[{{nTraining+1, nElement}}], acc_list, 2)
+  --   faultfile = hdf5.open('/home/salab/Documents/workspace/data/ReduceFA/output/faultfile.h5', 'w')
+  --   faultfile:write('/list', l)
+  --   faultfile:close()
+  -- end
 
   time = sys.clock() - time
   time = time / nTesting
