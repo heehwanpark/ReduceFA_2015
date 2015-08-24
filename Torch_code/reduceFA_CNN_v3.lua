@@ -13,7 +13,8 @@ cmd:text('Options:')
 -- Data
 cmd:option('-chaldata', '/home/salab/Documents/workspace/data/ReduceFA/chal2015_data_10sec_resampled.h5')
 cmd:option('-mitdata', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
-cmd:option('-datatype', 'chal-2015') -- chal-2015, mitbih, mit+chal
+cmd:option('-mitdb', '/home/salab/Documents/workspace/data/ReduceFA/mitdb_seperated.h5')
+cmd:option('-datatype', 'mitdb') -- chal-2015, mitbih, mit+chal, mitdb (new mitbih)
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
@@ -49,7 +50,7 @@ cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0806_comp_c4_p4')
+cmd:option('-filename', '0824_result')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -92,6 +93,17 @@ elseif option.datatype == 'mit+chal' then
   chal_pretrainset = chal_pretrainset:transpose(1,2)
   chal_labelset_input = chal_labelset_input:transpose(1,2)
   chal_labelset_target = chal_labelset_target:transpose(1,2)
+elseif option.datatype == 'mitdb' then
+  mitdb = hdf5.open(option.mitdb, 'r')
+  mitdb_tr_input = mitdb:read('/training_inputs'):all()
+  mitdb_tr_target = mitdb:read('/training_targets'):all()
+  mitdb_te_input = mitdb:read('/testing_inputs'):all()
+  mitdb_te_target = mitdb:read('/testing_targets'):all()
+
+  mitdb_tr_input = mitdb_tr_input:transpose(1,2)
+  mitdb_tr_target = mitdb_tr_target:transpose(1,2)
+  mitdb_te_input = mitdb_te_input:transpose(1,2)
+  mitdb_te_target = mitdb_te_target:transpose(1,2)
 else
   error('==> datatype error!!')
 end
@@ -329,7 +341,16 @@ elseif option.datatype == 'chal-2015' then
 
   testset_input = chal_testset_input
   testset_target = chal_testset_target
+elseif option.datatype == 'mitdb' then
+  nTraining = mitdb_tr_target:size(1)
+  nTesting = mitdb_te_target:size(1)
+  nElement = nTraining + nTesting
 
+  trainset_input = mitdb_tr_input
+  trainset_target = mitdb_tr_target
+
+  testset_input = mitdb_te_input
+  testset_target = mitdb_te_target
 else
   error('==> datatype error!!')
 end
