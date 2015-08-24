@@ -376,7 +376,7 @@ function train()
 
   shuffle_t = torch.randperm(nTraining)
 
-  print('==> doing epoch on training data:')
+  print('\n==> doing epoch on training data:')
   print("==> online epoch # " .. epoch .. ' [batchSize = ' .. batchsize .. ']')
   for t = 1, math.floor(nTraining/batchsize) do
     local inputs = {}
@@ -420,7 +420,7 @@ function train()
   time = sys.clock() - time
   time = time / nTraining
 
-  print("\n==> time to learn 1 sample = " .. (time*1000) .. 'ms')
+  print("==> time to learn 1 sample = " .. (time*1000) .. 'ms')
 
   print(confusion)
   cur_err = cur_err/math.floor(nTraining/batchsize)
@@ -440,7 +440,7 @@ function test()
   local acc_list = torch.zeros(nTesting)
 
   model:evaluate()
-  print ('==> testing on test set:')
+  print ('\n==> testing on test set:')
   for t = 1, nTesting do
     local input = testset_input[{{t, {}}}]
     input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
