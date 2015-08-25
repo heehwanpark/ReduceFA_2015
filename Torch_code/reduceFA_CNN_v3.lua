@@ -13,7 +13,7 @@ cmd:text('Options:')
 -- Data
 cmd:option('-chaldata', '/home/salab/Documents/workspace/data/ReduceFA/chal2015_data_10sec_resampled.h5')
 cmd:option('-mitdata', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
-cmd:option('-mitdb', '/home/salab/Documents/workspace/data/ReduceFA/mitdb_seperated.h5')
+cmd:option('-mitdb', '/home/salab/Documents/workspace/data/ReduceFA/mitdb_norm_sep.h5')
 cmd:option('-datatype', 'mitdb') -- chal-2015, mitbih, mit+chal, mitdb (new mitbih)
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
@@ -424,6 +424,7 @@ function train()
 
   print(confusion)
   cur_err = cur_err/math.floor(nTraining/batchsize)
+  print("==> current error = " .. cur_err)
 
   result_train_accu[epoch] = confusion.totalValid
   result_train_err[epoch] = cur_err
