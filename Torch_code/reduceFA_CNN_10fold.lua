@@ -116,7 +116,7 @@ elseif option.datatype == 'mitdb' then
     selected_input = mitdb_input[{{start_idx, end_idx}, {}}]
     selected_target = mitdb_target[{{start_idx, end_idx}, {}}]
     if i <= 41 then
-      if i = 1 then
+      if i == 1 then
         mitdb_tr_input = selected_input
         mitdb_tr_target = selected_target
       else
@@ -124,7 +124,7 @@ elseif option.datatype == 'mitdb' then
         mitdb_tr_target = mitdb_tr_target:cat(selected_target, 1)
       end
     else
-      if i = 42 then
+      if i == 42 then
         mitdb_te_input = selected_input
         mitdb_te_target = selected_target
       else
