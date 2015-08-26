@@ -110,7 +110,7 @@ elseif option.datatype == 'mitdb' then
 
   db_shuffle_idx = torch.randperm(46)
   for i = 1, 46 do
-    file_idx = db_shuffle_idx(i)
+    file_idx = db_shuffle_idx[i]
     start_idx = (file_idx-1)*180 + 1
     end_idx = file_idx*180
     selected_input = mitdb_input[{{start_idx, end_idx}, {}}]
