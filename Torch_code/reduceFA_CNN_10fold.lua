@@ -398,8 +398,11 @@ for fold_index = 1, 10 do
   result_test_accu = torch.zeros(option.maxIter)
   result_test_err = torch.zeros(option.maxIter)
 
+  epoch = 1
+  test_count = 1
+
   function train()
-    epoch = epoch or 1
+    -- epoch = epoch or 1
 
     cur_err = 0
 
@@ -467,7 +470,7 @@ for fold_index = 1, 10 do
   end
 
   function test()
-    test_count = test_count or 1
+    -- test_count = test_count or 1
     local f = 0
     local time = sys.clock()
 
