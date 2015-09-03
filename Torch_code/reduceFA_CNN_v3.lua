@@ -14,7 +14,7 @@ cmd:text('Options:')
 cmd:option('-chaldata', '/home/salab/Documents/workspace/data/ReduceFA/chal2015_data_10sec_resampled.h5')
 cmd:option('-mitdata', '/home/salab/Documents/workspace/data/ReduceFA/mitbih_data_10sec_v2.h5')
 cmd:option('-mitdb', '/home/salab/Documents/workspace/data/ReduceFA/mitdb_norm_sep.h5')
-cmd:option('-datatype', 'mitdb') -- chal-2015, mitbih, mit+chal, mitdb (new mitbih)
+cmd:option('-datatype', 'chal-2015') -- chal-2015, mitbih, mit+chal, mitdb (new mitbih)
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
@@ -50,7 +50,7 @@ cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0824_result')
+cmd:option('-filename', '0903_result')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -364,6 +364,7 @@ result_train_err = torch.zeros(option.maxIter)
 
 result_test_accu = torch.zeros(option.maxIter)
 result_test_err = torch.zeros(option.maxIter)
+result_test_conf = torch.zeros(option.maxIter, 4)
 
 function train()
   epoch = epoch or 1
@@ -477,6 +478,12 @@ function test()
   result_test_accu[test_count] = confusion.totalValid
   result_test_err[test_count] = f
 
+  cm = confusion.mat
+  result_test_conf[test_count][1] = cm[1][1]
+  result_test_conf[test_count][2] = cm[1][2]
+  result_test_conf[test_count][3] = cm[2][1]
+  result_test_conf[test_count][4] = cm[2][2]
+
   confusion:zero()
   test_count = test_count + 1
 end
@@ -499,6 +506,7 @@ recordfile:write('/train_accu', result_train_accu)
 recordfile:write('/train_err', result_train_err)
 recordfile:write('/test_accu', result_test_accu)
 recordfile:write('/test_err', result_test_err)
+recordfile:write('/test_confmatrix', result_test_conf)
 recordfile:close()
 -- table.save(result_train, 'result_train_pre')
 -- table.save(result_test, 'result_test_pre')
