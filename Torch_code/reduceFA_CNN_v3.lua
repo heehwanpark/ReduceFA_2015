@@ -41,7 +41,7 @@ cmd:option('-nFold', 5)
 cmd:option('-maxIter', 500)
 cmd:option('-lr_sup', 0.001, 'Learning rate')
 cmd:option('-lr_unsup', 5e-6, 'Learning rate')
-cmd:option('-lrdecay',1e-5, 'Learning rate decay')
+cmd:option('-lrdecay',1e-6, 'Learning rate decay')
 cmd:option('-momentum', 0)
 cmd:option('-pretraining', false)
 -- Conv Setting
