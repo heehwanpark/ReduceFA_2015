@@ -20,8 +20,6 @@ len = length(filelist);
 inputs = zeros(100000, 1250);
 targets = zeros(100000, 1);
 
-nlist = zeros(len,1);
-
 start = 1;
 for i = 1:len
     filenum = filelist{i};
@@ -31,12 +29,6 @@ for i = 1:len
     target = target';
     
     n = length(target);
-    disp(n);
-    nlist(i) = n;
     inputs(start:start-1+n,:) = input;
-    targets(start:start-1+n) = target;
-    start = start + n;
-end
-
-inputs(start:end,:) = [];
-targets(start:end) = [];
+    targets(start:start-1+n) = input;
+    

@@ -3,35 +3,35 @@ import numpy
 import datetime
 import h5py
 
-def checkNumAlarm(dbfolder, filenum, ann_num, alM_num):
-    ann_list = []
-    alM_list = []
-
-    # open and read annotation (machine alarm) file
-    with open(dbfolder+'annotations'+filenum+'.txt', 'rb') as annfile :
-        annfile.next()
-        for line in annfile :
-            line_list = line.split()
-            if ('ASYSTOLE' in line_list or
-                '**BRADY' in line_list or
-                '***BRADY' in line_list or
-                '**TACHY' in line_list or
-                '***TACHY' in line_list or
-                'V-FIB/TACH' in line_list or
-                'V-TACH' in line_list) :
-                ann_list.append(float(line_list[2]))
-
-    # open and read alM (annotated by human experts) file
-    with open(dbfolder+'alM'+filenum+'.txt', 'rb') as alMfile :
-        alMfile.next()
-        for line in alMfile:
-            line_list = line.split()
-            alM_list.append(float(line_list[2]))
-
-    ann_num = ann_num + len(ann_list)
-    alM_num = alM_num + len(alM_list)
-
-    return ann_num, alM_num
+# def checkNumAlarm(dbfolder, filenum, ann_num, alM_num):
+#     ann_list = []
+#     alM_list = []
+#
+#     # open and read annotation (machine alarm) file
+#     with open(dbfolder+'annotations'+filenum+'.txt', 'rb') as annfile :
+#         annfile.next()
+#         for line in annfile :
+#             line_list = line.split()
+#             if ('ASYSTOLE' in line_list or
+#                 '**BRADY' in line_list or
+#                 '***BRADY' in line_list or
+#                 '**TACHY' in line_list or
+#                 '***TACHY' in line_list or
+#                 'V-FIB/TACH' in line_list or
+#                 'V-TACH' in line_list) :
+#                 ann_list.append(float(line_list[2]))
+#
+#     # open and read alM (annotated by human experts) file
+#     with open(dbfolder+'alM'+filenum+'.txt', 'rb') as alMfile :
+#         alMfile.next()
+#         for line in alMfile:
+#             line_list = line.split()
+#             alM_list.append(float(line_list[2]))
+#
+#     ann_num = ann_num + len(ann_list)
+#     alM_num = alM_num + len(alM_list)
+#
+#     return ann_num, alM_num
 
 def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_alarms):
     print("Start extracting from File " + filenum)
@@ -53,20 +53,6 @@ def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_ala
             except Exception as e:
                 value = 0
             wave.append(value)
-
-    # # open and read annotation (machine alarm) file
-    # with open(dbfolder+'annotations'+filenum+'.txt', 'rb') as annfile :
-    #     annfile.next()
-    #     for line in annfile :
-    #         line_list = line.split()
-    #         if ('ASYSTOLE' in line_list or
-    #             '**BRADY' in line_list or
-    #             '***BRADY' in line_list or
-    #             '**TACHY' in line_list or
-    #             '***TACHY' in line_list or
-    #             'V-FIB/TACH' in line_list or
-    #             'V-TACH' in line_list) :
-    #             ann_list.append(float(line_list[2]))
 
     # open and read alM (annotated by human experts) file
     with open(dbfolder+'alM'+filenum+'.txt', 'rb') as alMfile :
@@ -95,9 +81,6 @@ def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_ala
         for i in xrange(len(alM_list)):
             if alM_list[i] >= start_idx and alM_list[i] <= end_idx:
                 input = wave[start_idx:end_idx]
-                for j in xrange(10*hz):
-                    if numpy.absolute(input[j]) > 3:
-                        input[j] = 0
                 mean = numpy.mean(input)
                 std = numpy.std(input)
                 if std == 0:
@@ -138,12 +121,12 @@ def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_ala
 if __name__ == "__main__":
     dbfolder = '/media/heehwan/HDD_1TB/WFDB_data/MIMIC2_ver2/'
     logfile = open('error_log', 'w')
-    f = h5py.File("mimic2_savefile.h5", "w")
+    f = h5py.File("mimic2_savefile_v1.h5", "w")
 
     all_alarms = 0
     true_alarms = 0
 
-    # filenum = "a40017"
+    # filenum = "a42431"
     # all_alarms, true_alarms = extractWaveFromMimicfile(dbfolder, filenum, f, all_alarms, true_alarms)
     # print(str(all_alarms) + " : " + str(true_alarms))
 
@@ -155,7 +138,7 @@ if __name__ == "__main__":
                 print(str(all_alarms) + " : " + str(true_alarms))
             except Exception as e:
                 logfile.write(filenum + '\n')
-                logfile.write(str(e) + '\n')
+                logfile.write(e.args + '\n')
     f.close()
     logfile.close()
 
