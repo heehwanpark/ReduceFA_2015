@@ -3,7 +3,7 @@
 clc;
 clear;
 
-fid=fopen('training\ALARMS','r');
+fid=fopen('/home/heehwan/Workspace/Data/ReduceFA_2015/training/ALARMS','r');
 if(fid ~= -1)
     RECLIST=textscan(fid,'%s %s %d','Delimiter',',');
     fclose(fid);
@@ -16,11 +16,8 @@ ALARMS=RECLIST{2};
 TF = RECLIST{3};
 N=length(RECORDS);
 
-oldfreq = 250;
-newfreq = 360;
 sec = 10;
-segmentlen = oldfreq * sec;
-inputlen = newfreq * sec;
+inputlen = sec*250;
 num_segment = 300/sec;
 
 pretraining = zeros(728*(num_segment-1),inputlen);
@@ -41,26 +38,23 @@ for i=1:N
     
     if sum(strcmp(description,'II')) % II exists
         idx = find(strcmp(description,'II'));        
-        struc = load(['training\' fname '.mat']);
+        struc = load(['/home/heehwan/Workspace/Data/ReduceFA_2015/training/' fname '.mat']);
         val = struc.val;        
         sel_val = val(idx,:); % +5 min long
         sel_val(isnan(sel_val)) = 0; % get rid of NaN
         recordlist{IIidx} = fname;
         IIidx = IIidx + 1;
         for j=1:num_segment
-            X = sel_val(segmentlen*(j-1)+1:segmentlen*j);
+            X = sel_val(inputlen*(j-1)+1:inputlen*j);
             X = (X - mean(X))./std(X);
             X(isnan(X)) = 0;
             
-            % resampling
-            n_X = downsample(interp(X, 36), 25);
-            
             if j ~= num_segment
                 ptcount = ptcount+1;
-                pretraining(ptcount,:) = n_X;
+                pretraining(ptcount,:) = X;
             else
                 tcount = tcount+1;
-                training(tcount,:) = n_X;                
+                training(tcount,:) = X;                
                 if TF(i) == 1 
                     Y = 1;
                 else
@@ -72,13 +66,13 @@ for i=1:N
     end    
 end
 
-h5create('C:\Users\heehwan\workspace\Data\chal2015_data_10sec_resampled_0831.h5','/pretrain', [728*(num_segment-1) inputlen]);
-h5write('C:\Users\heehwan\workspace\Data\chal2015_data_10sec_resampled_0831.h5', '/pretrain', pretraining);
+h5create('/home/heehwan/Workspace/Data/ReduceFA_2015/chal2015.h5','/pretrain', size(pretraining));
+h5write('/home/heehwan/Workspace/Data/ReduceFA_2015/chal2015.h5', '/pretrain', pretraining);
 
-h5create('C:\Users\heehwan\workspace\Data\chal2015_data_10sec_resampled_0831.h5','/input', [728 inputlen]);
-h5write('C:\Users\heehwan\workspace\Data\chal2015_data_10sec_resampled_0831.h5', '/input', training);
+h5create('/home/heehwan/Workspace/Data/ReduceFA_2015/chal2015.h5','/inputs', size(training));
+h5write('/home/heehwan/Workspace/Data/ReduceFA_2015/chal2015.h5','/inputs', training);
 
-h5create('C:\Users\heehwan\workspace\Data\chal2015_data_10sec_resampled_0831.h5','/target', [728 1]);
-h5write('C:\Users\heehwan\workspace\Data\chal2015_data_10sec_resampled_0831.h5', '/target', target);
+h5create('/home/heehwan/Workspace/Data/ReduceFA_2015/chal2015.h5','/targets', size(target));
+h5write('/home/heehwan/Workspace/Data/ReduceFA_2015/chal2015.h5','/targets', target);
 
 save('recordlist.mat','recordlist');

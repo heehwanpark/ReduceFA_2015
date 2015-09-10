@@ -121,7 +121,7 @@ def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_ala
 if __name__ == "__main__":
     dbfolder = '/media/heehwan/HDD_1TB/WFDB_data/MIMIC2_ver2/'
     logfile = open('error_log', 'w')
-    f = h5py.File("mimic2_savefile_v1.h5", "w")
+    f = h5py.File("/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_savefile_v1.h5", "w")
 
     all_alarms = 0
     true_alarms = 0

@@ -7,7 +7,7 @@
 clc;
 clear;
 
-h5file = '/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_savefile.h5';
+h5file = '/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_savefile_v1.h5';
 mimiclist = '/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_annotation_list_v1';
 
 fid = fopen(mimiclist);
@@ -17,26 +17,37 @@ fclose(fid);
 filelist = contents{1};
 len = length(filelist);
 
-inputs = zeros(100000, 1250);
+inputs = zeros(100000, 2500);
 targets = zeros(100000, 1);
-
-nlist = zeros(len,1);
 
 start = 1;
 for i = 1:len
     filenum = filelist{i};
     input = h5read(h5file, strcat('/',filenum,'/inputs'));
-    input = input';
+    input = input';    
     target = h5read(h5file, strcat('/',filenum,'/targets'));
     target = target';
     
+    zero_idx = any(input, 2);
+    input(zero_idx == 0, :) = [];
+    target(zero_idx == 0) = [];
+    
     n = length(target);
-    disp(n);
-    nlist(i) = n;
-    inputs(start:start-1+n,:) = input;
+    resampled_input = zeros(n, 2500);
+    for j = 1:n
+        resampled_input(j,:) = interp(input(j,:),2);
+    end    
+    
+    inputs(start:start-1+n,:) = resampled_input;
     targets(start:start-1+n) = target;
     start = start + n;
 end
 
 inputs(start:end,:) = [];
 targets(start:end) = [];
+
+h5create('/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_overlapped.h5','/inputs', size(inputs));
+h5write('/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_overlapped.h5','/inputs', inputs);
+
+h5create('/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_overlapped.h5','/targets', size(targets));
+h5write('/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_overlapped.h5','/targets', targets);

@@ -74,7 +74,8 @@ for n=1:nargin
 end
 
 outputs={'tm','val','Fs','siginfo'};
-fid = fopen(['training\', recordName, '.hea'], 'rt');
+% fid = fopen(['training\', recordName, '.hea'], 'rt');
+fid = fopen(['/home/heehwan/Workspace/Data/ReduceFA_2015/training/', recordName, '.hea'], 'rt');
 if(fid==-1)
     error(['Could not open file: ' recordName '.hea !'])
 end
@@ -139,7 +140,7 @@ for m = 1:M
 end
 fclose(fid);
 
-load(['training\' recordName '.mat']);
+load(['/home/heehwan/Workspace/Data/ReduceFA_2015/training/' recordName '.mat']);
 val(val==wfdbNaN)= NaN;
 for m = 1:M
     %Convert from digital units to physical units.
