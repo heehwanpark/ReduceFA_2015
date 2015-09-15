@@ -11,34 +11,32 @@ cmd:text('Reducing False Alarms using CNNs')
 cmd:text()
 cmd:text('Options:')
 -- Data
-cmd:option('-chaldata', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_chal2015.h5')
-cmd:option('-mimic2data', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v2.h5')
-cmd:option('-mitdb', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mitdb_overlapped.h5')
+cmd:option('-chaldata', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_chal2015_v2.h5')
 -- Model
 -- Label: normal = 0, Asystole = 1, Bradycardia = 2, Tachycardia = 3,
 -- Ventricular Tachycardia = 4, Ventricular Flutter/Fibrillation = 5
 cmd:option('-nTarget', 2)
-cmd:option('-nInputFeature', 1)
+cmd:option('-nInputFeature', 4)
 cmd:option('-inputSize', 2500) -- 250Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures_c1', 50)
-cmd:option('-nFeatures_c2', 50)
-cmd:option('-nFeatures_c3', 50)
-cmd:option('-nFeatures_c4', 50)
+cmd:option('-nFeatures_c1', 400)
+cmd:option('-nFeatures_c2', 400)
+cmd:option('-nFeatures_c3', 400)
+cmd:option('-nFeatures_c4', 400)
 -- cmd:option('-nFeatures_c5', 60)
 -- cmd:option('-nFeatures_c6', 60)
 -- cmd:option('-nFeatures_c7', 60)
 --- For MLP
-cmd:option('-nFeatures_m1', 500)
--- --- For PSD
--- cmd:option('-lambda', 1)
--- cmd:option('-beta', 1)
+cmd:option('-nFeatures_m1', 2000)
+--- For PSD
+cmd:option('-lambda', 1)
+cmd:option('-beta', 1)
 -- Experiment Setting
 cmd:option('-seed', 1)
-cmd:option('-batchsize', 10)
+cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
-cmd:option('-maxIter', 100)
-cmd:option('-lr_sup', 0.001, 'Learning rate')
+cmd:option('-maxIter', 200)
+cmd:option('-lr_sup', 1e-3, 'Learning rate')
 cmd:option('-lr_unsup', 5e-6, 'Learning rate')
 cmd:option('-lrdecay',1e-6, 'Learning rate decay')
 cmd:option('-momentum', 0)
@@ -49,7 +47,7 @@ cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0911_result_04')
+cmd:option('-filename', '0911_multi_02')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -64,28 +62,19 @@ print '==> Load datasets'
 require 'hdf5'
 
 chal_file = hdf5.open(option.chaldata, 'r')
-chal_input = chal_file:read('/inputs'):all()
-chal_target = chal_file:read('/targets'):all()
-chal_file:close()
+chal_inputs = {}
+chal_targets = {}
+for i = 1, 750 do
+   input_folder = '/' .. i .. '/inputs'
+   target_folder = '/' .. i .. '/target'
 
-chal_input = chal_input:transpose(1,2)
-chal_target = chal_target:transpose(1,2)
+   each_inputs = chal_file:read(input_folder):all()
+   each_inputs = each_inputs:transpose(1,2)
+   chal_inputs[i] = each_inputs
 
-mimic2_file = hdf5.open(option.mimic2data, 'r')
-mimic2_input = mimic2_file:read('/inputs'):all()
-mimic2_target = mimic2_file:read('/targets'):all()
-mimic2_file:close()
-
-mimic2_input = mimic2_input:transpose(1,2)
-mimic2_target = mimic2_target:transpose(1,2)
-
--- mitdb_file = hdf5.open(option.mitdb, 'r')
--- mitdb_input = mitdb_file:read('/inputs'):all()
--- mitdb_target = mitdb_file:read('/targets'):all()
--- mitdb_file:close()
---
--- mitdb_input = mitdb_input:transpose(1,2)
--- mitdb_target = mitdb_target:transpose(1,2)
+   each_target = chal_file:read(target_folder):all()
+   chal_targets[i] = each_target
+ end
 
 ----------------------------------------------------------------------
 if option.pretraining then
@@ -151,13 +140,13 @@ model:add(nn.SpatialMaxPooling(1, option.pool))
 
 -- Calculate # of outputs
 nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
-
+--
 -- -- 5th convolution layer
 -- model:add(nn.SpatialConvolutionMM(option.nFeatures_c4, option.nFeatures_c5, 1, option.kernel))
 -- model:add(nn.ReLU())
 -- model:add(nn.SpatialMaxPooling(1, option.pool))
 --
--- Calculate # of outputs
+-- -- Calculate # of outputs
 -- nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- -- 6th convolution layer
@@ -198,7 +187,7 @@ print '==> Defining loss'
 
 -- weight = torch.Tensor(2)
 -- weight[1] = 1
--- weight[2] = 5
+-- weight[2] = 10
 -- criterion = nn.ClassNLLCriterion(weight)
 criterion = nn.ClassNLLCriterion()
 criterion:cuda()
@@ -224,50 +213,28 @@ torch.manualSeed(1)
 parameters, gradParameters = model:getParameters()
 batchsize = option.batchsize
 
-nSample_chal = chal_target:size(1)
-nSample_mimic2 = mimic2_target:size(1)
--- nSample_mitdb = mitdb_target:size(1)
-
-nElement = nSample_chal + nSample_mimic2
+nElement = table.getn(chal_targets)
 -- nElement = nSample_chal + nSample_mimic2 + nSample_mitdb
-nTesting = nSample_chal - 500
+nTesting = 150
 nTraining = nElement - nTesting
 
-shuffle = torch.randperm(nSample_chal)
+shuffle = torch.randperm(nElement)
 
-trainset_input = torch.zeros(nTraining, option.inputSize)
-trainset_target = torch.zeros(nTraining, 1)
-for i = 1, nTraining do
-  if i <= nSample_mimic2 then
-    trainset_input[{i, {}}] = mimic2_input[{i, {}}]
-    trainset_target[i] = mimic2_target[i]
+trainset_input = {}
+trainset_target = {}
+
+testset_input = {}
+testset_target = {}
+
+for i = 1, nElement do
+  if i <= nTraining then
+    trainset_input[i] = chal_inputs[shuffle[i]]
+    trainset_target[i] = chal_targets[shuffle[i]]
   else
-    trainset_input[{i, {}}] = chal_input[{shuffle[i-(nSample_mimic2)], {}}]
-    trainset_target[i] = chal_target[shuffle[i-(nSample_mimic2)]]
+    testset_input[i-nTraining] = chal_inputs[shuffle[i]]
+    testset_target[i-nTraining] = chal_targets[shuffle[i]]
   end
 end
--- for i = 1, nTraining do
---   if i <= nSample_mimic2 then
---     trainset_input[{i, {}}] = mimic2_input[{i, {}}]
---     trainset_target[i] = mimic2_target[i]
---   elseif i > nSample_mimic2 and i <= nSample_mimic2 + nSample_mitdb then
---     trainset_input[{i, {}}] = mitdb_input[{i-nSample_mimic2, {}}]
---     trainset_target[i] = mitdb_target[i-nSample_mimic2]
---   else
---     trainset_input[{i, {}}] = chal_input[{shuffle[i-(nSample_mimic2+nSample_mitdb)], {}}]
---     trainset_target[i] = chal_target[shuffle[i-(nSample_mimic2+nSample_mitdb)]]
---   end
--- end
-
-testset_input = torch.zeros(nTesting, option.inputSize)
-testset_target = torch.zeros(nTesting, 1)
-for i = 1, nTesting do
-  testset_input[{i, {}}] = chal_input[{shuffle[i+500], {}}]
-  testset_target[i] = chal_target[shuffle[i+500]]
-end
-
-print(trainset_input:size())
-print(testset_input:size())
 
 result_train_accu = torch.zeros(option.maxIter)
 result_train_err = torch.zeros(option.maxIter)
@@ -294,7 +261,7 @@ function train()
     local targets = {}
     batchstart = (t-1)*batchsize+1
     for i = batchstart,batchstart+batchsize-1 do
-      local input = trainset_input[{{shuffle_t[i], {}}}]
+      local input = trainset_input[shuffle_t[i]]
       input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
       local target = trainset_target[shuffle_t[i]][1]+1
       table.insert(inputs, input)
@@ -354,7 +321,7 @@ function test()
   model:evaluate()
   print ('\n==> testing on test set:')
   for t = 1, nTesting do
-    local input = testset_input[{{t, {}}}]
+    local input = testset_input[t]
     input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
     local target = testset_target[t][1]+1
     local pred = model:forward(input)

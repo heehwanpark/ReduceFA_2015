@@ -1,7 +1,7 @@
 clc;
 clear;
 
-X = (1:100)';
+X = (1:500)';
 
 % test_err_4 = h5read('0806_c4_p2_chal-2015_wo_pre.h5','/test_err');
 % test_err_5 = h5read('0806_c5_p2_chal-2015_wo_pre.h5','/test_err');
@@ -54,13 +54,13 @@ X = (1:100)';
 % title('NLL');
 
 
-tr_err_1 = h5read('0903_result_chal-2015_wo_pre.h5','/train_err');
-te_err_1 = h5read('0903_result_chal-2015_wo_pre.h5','/test_err');
+tr_err_1 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/conv_vs_pool/conv_vs_pool_3_mlplayer_wo_pre.h5','/train_err');
+te_err_1 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/conv_vs_pool/conv_vs_pool_3_mlplayer_wo_pre.h5','/test_err');
 
-tr_accu_1 = h5read('0903_result_chal-2015_wo_pre.h5','/train_accu');
-te_accu_1 = h5read('0903_result_chal-2015_wo_pre.h5','/test_accu');
+tr_accu_1 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/conv_vs_pool/conv_vs_pool_3_mlplayer_wo_pre.h5','/train_accu');
+te_accu_1 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/conv_vs_pool/conv_vs_pool_3_mlplayer_wo_pre.h5','/test_accu');
 
-test_conf = h5read('0903_result_chal-2015_wo_pre.h5','/test_confmatrix');
+test_conf = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/conv_vs_pool/conv_vs_pool_3_mlplayer_wo_pre.h5','/test_confmatrix');
 
 % tr_err_2 = h5read('0806_chal_result_2_wo_pre.h5','/train_err');
 % te_err_2 = h5read('0806_chal_result_2_wo_pre.h5','/test_err');
