@@ -23,14 +23,14 @@ function test()
   -- test_score = confusion.totalValid
   f = f/nTesting
 
-  result_test_accu[iter] = confusion.totalValid
-  result_test_err[iter] = f
+  test_accu[iter] = confusion.totalValid
+  test_err[iter] = f
 
   cm = confusion.mat
-  result_test_conf[iter][1] = cm[1][1]
-  result_test_conf[iter][2] = cm[1][2]
-  result_test_conf[iter][3] = cm[2][1]
-  result_test_conf[iter][4] = cm[2][2]
+  test_conf[iter][1] = cm[1][1]
+  test_conf[iter][2] = cm[1][2]
+  test_conf[iter][3] = cm[2][1]
+  test_conf[iter][4] = cm[2][2]
 
   confusion:zero()
 end

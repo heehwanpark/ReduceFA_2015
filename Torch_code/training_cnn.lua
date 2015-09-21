@@ -56,8 +56,8 @@
     cur_err = cur_err/math.floor(nTraining/batchsize)
     print("==> current error = " .. cur_err)
 
-    result_train_accu[iter] = confusion.totalValid
-    result_train_err[iter] = cur_err
+    train_accu[iter] = confusion.totalValid
+    train_err[iter] = cur_err
 
     confusion:zero()
   end
