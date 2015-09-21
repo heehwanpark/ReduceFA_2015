@@ -19,26 +19,26 @@ cmd:option('-nTarget', 2)
 cmd:option('-nInputFeature', 4)
 cmd:option('-inputSize', 2500) -- 250Hz * 10sec
 --- For convolutional networks
-cmd:option('-nFeatures_c1', 400)
-cmd:option('-nFeatures_c2', 400)
-cmd:option('-nFeatures_c3', 400)
-cmd:option('-nFeatures_c4', 400)
+cmd:option('-nFeatures_c1', 75)
+cmd:option('-nFeatures_c2', 75)
+cmd:option('-nFeatures_c3', 75)
+cmd:option('-nFeatures_c4', 75)
 -- cmd:option('-nFeatures_c5', 60)
 -- cmd:option('-nFeatures_c6', 60)
 -- cmd:option('-nFeatures_c7', 60)
 --- For MLP
-cmd:option('-nFeatures_m1', 2000)
+cmd:option('-nFeatures_m1', 500)
 --- For PSD
 cmd:option('-lambda', 1)
 cmd:option('-beta', 1)
 -- Experiment Setting
-cmd:option('-seed', 1)
+cmd:option('-seed', 15)
 cmd:option('-batchsize', 5)
 cmd:option('-nFold', 5)
 cmd:option('-maxIter', 200)
 cmd:option('-lr_sup', 1e-3, 'Learning rate')
 cmd:option('-lr_unsup', 5e-6, 'Learning rate')
-cmd:option('-lrdecay',1e-6, 'Learning rate decay')
+cmd:option('-lrdecay',1e-5, 'Learning rate decay')
 cmd:option('-momentum', 0)
 cmd:option('-pretraining', false)
 -- Conv Setting
@@ -47,7 +47,7 @@ cmd:option('-pool', 4)
 -- Torch Setting
 cmd:option('-thread', 16)
 -- File name
-cmd:option('-filename', '0911_multi_02')
+cmd:option('-filename', '0916_multi_3mlp')
 
 cmd:text()
 option = cmd:parse(arg)
@@ -167,11 +167,19 @@ nConvOut = math.floor((nConvOut - option.kernel + 1)/option.pool)
 
 -- Standard MLP
 model:add(nn.View(option.nFeatures_c4*nConvOut*1))
+
 model:add(nn.Linear(option.nFeatures_c4*nConvOut*1, option.nFeatures_m1))
 model:add(nn.ReLU())
+model:add(nn.Dropout(0.5))
+
 model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
 model:add(nn.ReLU())
 model:add(nn.Dropout(0.5))
+
+model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
+model:add(nn.ReLU())
+model:add(nn.Dropout(0.5))
+
 model:add(nn.Linear(option.nFeatures_m1, option.nTarget))
 model:add(nn.LogSoftMax())
 

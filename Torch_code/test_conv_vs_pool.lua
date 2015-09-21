@@ -1,7 +1,7 @@
 require 'torch'
 require 'detectFAinICU_v1'
 
-torch.manualSeed(1)
+torch.manualSeed(1) -- 1, 100, 200
 datatype = 'chal2015'
 inputSize = 2500
 x = torch.Tensor(10,10)
@@ -37,7 +37,7 @@ if datatype == 'both' then
   chal_input = chal_input:transpose(1,2)
   chal_target = chal_target:transpose(1,2)
 
-  mimic2_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v2.h5', 'r')
+  mimic2_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v3.h5', 'r')
   mimic2_input = mimic2_file:read('/inputs'):all()
   mimic2_target = mimic2_file:read('/targets'):all()
   mimic2_file:close()
@@ -110,7 +110,7 @@ end
 print(trainset_input:size())
 print(testset_input:size())
 
-detectFAinICU_v1(4, 3, '3_mlplayer')
+detectFAinICU_v1(3, 5, datatype .. '0918_01')
 
 -- for i=4,10 do
 --   for j=1,10 do

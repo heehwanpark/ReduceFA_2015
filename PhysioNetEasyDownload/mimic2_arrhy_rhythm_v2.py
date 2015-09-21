@@ -50,12 +50,12 @@ def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_ala
         segment_start = segment_end - 10*hz
         if segment_start >= 0 and segment_end < wave_length :
             input = wave[segment_start:segment_end]
-            mean = numpy.mean(input)
-            std = numpy.std(input)
-            if std == 0:
-                input = input - mean
-            else:
-                input = (input - mean)/std
+            # mean = numpy.mean(input)
+            # std = numpy.std(input)
+            # if std == 0:
+            #     input = input - mean
+            # else:
+            #     input = (input - mean)/std
 
             chan_num = int(chan_list[i])
             if chan_num == 1:
@@ -78,9 +78,9 @@ def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_ala
     print(inputs_array.shape)
     print(targets_array.shape)
 
-    # grp = h5file_obj.create_group(filenum)
-    groupname = '/'+filenum
-    grp = h5file_obj[groupname]
+    grp = h5file_obj.create_group(filenum)
+    # groupname = '/'+filenum
+    # grp = h5file_obj[groupname]
     grp.create_dataset("inputs", data=inputs_array)
     grp.create_dataset("targets", data=targets_array)
 
@@ -89,25 +89,25 @@ def extractWaveFromMimicfile(dbfolder, filenum, h5file_obj, all_alarms, true_ala
 if __name__ == "__main__":
     dbfolder = '/media/heehwan/HDD_1TB/WFDB_data/MIMIC2_ver2/'
     logfile = open('error_log', 'w')
-    f = h5py.File("/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_savefile_v2.h5", "a")
+    f = h5py.File("/home/heehwan/Workspace/Data/ReduceFA_2015/mimic2_savefile_v3.h5", "a")
     # f = h5py.File("mimic2_savefile_v2.h5", "w")
 
     all_alarms = 0
     true_alarms = 0
 
-    filenum = "a40454"
-    all_alarms, true_alarms = extractWaveFromMimicfile(dbfolder, filenum, f, all_alarms, true_alarms)
-    print(str(all_alarms) + " : " + str(true_alarms))
+    # filenum = "a40454"
+    # all_alarms, true_alarms = extractWaveFromMimicfile(dbfolder, filenum, f, all_alarms, true_alarms)
+    # print(str(all_alarms) + " : " + str(true_alarms))
 
-    # with open('mimic2_annotation_list_v1', 'r') as filelist:
-    #     for filenum in filelist:
-    #         filenum = filenum.strip()
-    #         try:
-    #             all_alarms, true_alarms = extractWaveFromMimicfile(dbfolder, filenum, f, all_alarms, true_alarms)
-    #             print(str(all_alarms) + " : " + str(true_alarms))
-    #         except Exception as e:
-    #             print(e)
-    #             logfile.write(filenum + '\n')
-    #
-    # f.close()
-    # logfile.close()
+    with open('mimic2_annotation_list_v1', 'r') as filelist:
+        for filenum in filelist:
+            filenum = filenum.strip()
+            try:
+                all_alarms, true_alarms = extractWaveFromMimicfile(dbfolder, filenum, f, all_alarms, true_alarms)
+                print(str(all_alarms) + " : " + str(true_alarms))
+            except Exception as e:
+                print(e)
+                logfile.write(filenum + '\n')
+
+    f.close()
+    logfile.close()

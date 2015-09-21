@@ -26,11 +26,9 @@ for i = 1:10 % conv layer
             test_accu = h5read([folder filename], '/test_accu');
             test_err = h5read([folder filename], '/test_err');
             test_conf = h5read([folder filename], '/test_confmatrix');
-            [~, min_i] = min(test_err);
-            disp(test_accu(min_i))
             disp(max(test_accu))
             [~, max_i] = max(test_accu);
-            accu_mat(i,j) = test_accu(min_i);
+            accu_mat(i,j) = test_accu(max_i);
             min_conf = test_conf(:,max_i);
             TP = min_conf(4);
             TN = min_conf(1);

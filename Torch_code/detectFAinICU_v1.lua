@@ -31,10 +31,10 @@ function detectFAinICU_v1(convlayer_num, pool_size, testnum)
   cmd:option('-seed', 1)
   cmd:option('-batchsize', 5)
   cmd:option('-nFold', 5)
-  cmd:option('-maxIter', 500)
-  cmd:option('-lr_sup', 0.0001, 'Learning rate')
+  cmd:option('-maxIter', 200)
+  cmd:option('-lr_sup', 0.001, 'Learning rate')
   cmd:option('-lr_unsup', 5e-6, 'Learning rate')
-  cmd:option('-lrdecay',1e-6, 'Learning rate decay')
+  cmd:option('-lrdecay',1e-5, 'Learning rate decay')
   cmd:option('-momentum', 0)
   cmd:option('-pretraining', false)
   -- Conv Setting
@@ -43,7 +43,7 @@ function detectFAinICU_v1(convlayer_num, pool_size, testnum)
   -- Torch Setting
   cmd:option('-thread', 16)
   -- File name
-  cmd:option('-filename', 'conv_vs_pool_' .. testnum)
+  cmd:option('-filename', '0917_' .. testnum)
 
   cmd:text()
   option = cmd:parse(arg)
@@ -52,8 +52,6 @@ function detectFAinICU_v1(convlayer_num, pool_size, testnum)
 
   torch.manualSeed(option.seed)
   torch.setnumthreads(option.thread)
-  ----------------------------------------------------------------------
-
   ----------------------------------------------------------------------
   require 'cutorch'
   require 'cunn'
@@ -81,7 +79,7 @@ function detectFAinICU_v1(convlayer_num, pool_size, testnum)
     end
   end
   -- Standard MLP
-  model:add(nn.View(option.nFeatures_c*nConvOut*1))
+  model:add(nn.Reshape(option.nFeatures_c*nConvOut*1))
 
   model:add(nn.Linear(option.nFeatures_c*nConvOut*1, option.nFeatures_m1))
   model:add(nn.ReLU())
@@ -90,6 +88,10 @@ function detectFAinICU_v1(convlayer_num, pool_size, testnum)
   model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
   model:add(nn.ReLU())
   model:add(nn.Dropout(0.5))
+
+  -- model:add(nn.Linear(option.nFeatures_m1, option.nFeatures_m1))
+  -- model:add(nn.ReLU())
+  -- model:add(nn.Dropout(0.5))
 
   model:add(nn.Linear(option.nFeatures_m1, option.nTarget))
   model:add(nn.LogSoftMax())
@@ -146,7 +148,7 @@ function detectFAinICU_v1(convlayer_num, pool_size, testnum)
     iter = iter + 1
   end
 
-  folder = '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/conv_vs_pool/'
+  folder = '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/'
   if option.pretraining then
     recordfile = hdf5.open(folder .. option.filename .. '_wi_pre.h5', 'w')
   else
