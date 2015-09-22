@@ -120,6 +120,7 @@ function getLearningData(option)
       testset_input[{i, {}}] = chal_input[{shuffle[i+chal_nTraining], {}}]
       testset_target[i] = chal_target[shuffle[i+chal_nTraining]]
     end
+    nTraining = chal_trainsize
   else
     print("Wrong dataset type!")
     do return end
