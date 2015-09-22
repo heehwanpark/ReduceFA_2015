@@ -28,103 +28,185 @@ function getLearningData(option)
   torch.manualSeed(seed)
 
   -- # of training elements in challenge 2015 set
-  chal_trainsize = 600
+  local chal_trainsize = 600
+  local nEle_chal = chal_target:size(1)
+  local nEle_mimic2 = mimic2_target:size(1)
+  local shuffle = torch.randperm(nEle_chal)
+
+  nTesting = nEle_chal - chal_trainsize
+  testset_input = torch.zeros(nTesting, inputSize)
+  testset_target = torch.zeros(nTesting, 1)
+  for i = 1, nTesting do
+    testset_input[{i, {}}] = chal_input[{shuffle[i], {}}]
+    testset_target[i] = chal_target[shuffle[i]]
+  end
 
   if datatype == 'chal' then
-    nElement = chal_target:size(1)
-    nTraining = chal_trainsize
-    nTesting = nElement - nTraining
-
-    local shuffle = torch.randperm(nElement)
-
     -- Make training set: challenge2015
+    nTraining = chal_trainsize
     trainset_input = torch.zeros(nTraining, inputSize)
     trainset_target = torch.zeros(nTraining, 1)
     for i = 1, nTraining do
-      trainset_input[{i, {}}] = chal_input[{shuffle[i], {}}]
-      trainset_target[i] = chal_target[shuffle[i]]
-    end
-    -- Make test set: challenge2015
-    testset_input = torch.zeros(nTesting, inputSize)
-    testset_target = torch.zeros(nTesting, 1)
-    for i = 1, nTesting do
-      testset_input[{i, {}}] = chal_input[{shuffle[i+nTraining], {}}]
-      testset_target[i] = chal_target[shuffle[i+nTraining]]
+      trainset_input[{i, {}}] = chal_input[{shuffle[nTesting+i], {}}]
+      trainset_target[i] = chal_target[shuffle[nTesting+i]]
     end
   elseif datatype == 'mimic+chal_all' then
-    local nSample_chal = chal_target:size(1)
-    local nSample_mimic2 = mimic2_target:size(1)
-
-    local chal_nTraining = chal_trainsize
-    nElement = nSample_chal + nSample_mimic2
-    nTesting = nSample_chal - chal_nTraining
-    nTraining = nElement - nTesting
-
-    local shuffle = torch.randperm(nSample_chal)
-
     -- Make training set: mimic2 + challenge2015
+    nTraining = nEle_mimic2 + chal_trainsize
     trainset_input = torch.zeros(nTraining, inputSize)
     trainset_target = torch.zeros(nTraining, 1)
     for i = 1, nTraining do
-      if i <= nSample_mimic2 then
+      if i <= nEle_mimic2 then
         trainset_input[{i, {}}] = mimic2_input[{i, {}}]
         trainset_target[i] = mimic2_target[i]
       else
-        trainset_input[{i, {}}] = chal_input[{shuffle[i-(nSample_mimic2)], {}}]
-        trainset_target[i] = chal_target[shuffle[i-(nSample_mimic2)]]
+        trainset_input[{i, {}}] = chal_input[{shuffle[nTesting+i-(nEle_mimic2)], {}}]
+        trainset_target[i] = chal_target[shuffle[nTesting+i-(nEle_mimic2)]]
       end
     end
-    -- Make test set: mimic2 + challenge2015
-    testset_input = torch.zeros(nTesting, inputSize)
-    testset_target = torch.zeros(nTesting, 1)
-    for i = 1, nTesting do
-      testset_input[{i, {}}] = chal_input[{shuffle[i+chal_nTraining], {}}]
-      testset_target[i] = chal_target[shuffle[i+chal_nTraining]]
-    end
   elseif datatype == 'mimic+chal_small' then
-    local nSample_chal = chal_target:size(1)
-    local nSample_mimic2 = mimic2_target:size(1)
-
-    local chal_nTraining = chal_trainsize
-    nElement = nSample_chal + nSample_mimic2
-    nTesting = nSample_chal - chal_nTraining
-    nTraining = nElement - nTesting
-
-    local shuffle = torch.randperm(nSample_chal)
-
+    all_nTraining = nEle_mimic2 + chal_trainsize
     -- Make training set: mimic2 + challenge2015
-    local all_trainset_input = torch.zeros(nTraining, inputSize)
-    local all_trainset_target = torch.zeros(nTraining, 1)
-    for i = 1, nTraining do
+    local all_trainset_input = torch.zeros(all_nTraining, inputSize)
+    local all_trainset_target = torch.zeros(all_nTraining, 1)
+    for i = 1, all_nTraining do
       if i <= nSample_mimic2 then
         all_trainset_input[{i, {}}] = mimic2_input[{i, {}}]
         all_trainset_target[i] = mimic2_target[i]
       else
-        all_trainset_input[{i, {}}] = chal_input[{shuffle[i-(nSample_mimic2)], {}}]
-        all_trainset_target[i] = chal_target[shuffle[i-(nSample_mimic2)]]
+        all_trainset_input[{i, {}}] = chal_input[{shuffle[nTesting+i-(nEle_mimic2)], {}}]
+        all_trainset_target[i] = chal_target[shuffle[nTesting+i-(nEle_mimic2)]]
       end
     end
-
-    local shuffle_all = torch.randperm(nTraining)
-
-    trainset_input = torch.zeros(chal_trainsize, inputSize)
-    trainset_target = torch.zeros(chal_trainsize, 1)
-    for i = 1, chal_trainsize do
+    -- Make training set: pick 600 elements
+    local shuffle_all = torch.randperm(all_nTraining)
+    nTraining = chal_trainsize
+    trainset_input = torch.zeros(nTraining, inputSize)
+    trainset_target = torch.zeros(nTraining, 1)
+    for i = 1, nTraining do
       trainset_input[{i, {}}] = all_trainset_input[{shuffle_all[i], {}}]
       trainset_target[i] = all_trainset_target[shuffle_all[i]]
     end
-
-    testset_input = torch.zeros(nTesting, inputSize)
-    testset_target = torch.zeros(nTesting, 1)
-    for i = 1, nTesting do
-      testset_input[{i, {}}] = chal_input[{shuffle[i+chal_nTraining], {}}]
-      testset_target[i] = chal_target[shuffle[i+chal_nTraining]]
+  elseif datatype == 'mimic2_all' then
+    nTraining = nEle_mimic2
+    trainset_input = torch.zeros(nTraining, inputSize)
+    trainset_target = torch.zeros(nTraining, 1)
+    for i = 1, nTraining do
+      trainset_input[{i, {}}] = mimic2_input[{i, {}}]
+      trainset_target[i] = mimic2_target[i]
     end
+  elseif datatype == 'mimic2_small' then
+    local shuffle_all = torch.randperm(nEle_mimic2)
     nTraining = chal_trainsize
+    trainset_input = torch.zeros(nTraining, inputSize)
+    trainset_target = torch.zeros(nTraining, 1)
+    for i = 1, nTraining do
+      trainset_input[{i, {}}] = mimic2_input[{shuffle_all[i], {}}]
+      trainset_target[i] = mimic2_target[shuffle_all[i]]
+    end
   else
     print("Wrong dataset type!")
     do return end
   end
-
   return nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target
 end
+  -- if datatype == 'chal' then
+  --   nElement = chal_target:size(1)
+  --   nTraining = chal_trainsize
+  --   nTesting = nElement - nTraining
+  --
+  --   local shuffle = torch.randperm(nElement)
+  --
+  --   -- Make training set: challenge2015
+  --   trainset_input = torch.zeros(nTraining, inputSize)
+  --   trainset_target = torch.zeros(nTraining, 1)
+  --   for i = 1, nTraining do
+  --     trainset_input[{i, {}}] = chal_input[{shuffle[i], {}}]
+  --     trainset_target[i] = chal_target[shuffle[i]]
+  --   end
+  --   -- Make test set: challenge2015
+  --   testset_input = torch.zeros(nTesting, inputSize)
+  --   testset_target = torch.zeros(nTesting, 1)
+  --   for i = 1, nTesting do
+  --     testset_input[{i, {}}] = chal_input[{shuffle[i+nTraining], {}}]
+  --     testset_target[i] = chal_target[shuffle[i+nTraining]]
+  --   end
+  -- elseif datatype == 'mimic+chal_all' then
+  --   local nSample_chal = chal_target:size(1)
+  --   local nSample_mimic2 = mimic2_target:size(1)
+  --
+  --   local chal_nTraining = chal_trainsize
+  --   nElement = nSample_chal + nSample_mimic2
+  --   nTesting = nSample_chal - chal_nTraining
+  --   nTraining = nElement - nTesting
+  --
+  --   local shuffle = torch.randperm(nSample_chal)
+  --
+  --   -- Make training set: mimic2 + challenge2015
+  --   trainset_input = torch.zeros(nTraining, inputSize)
+  --   trainset_target = torch.zeros(nTraining, 1)
+  --   for i = 1, nTraining do
+  --     if i <= nSample_mimic2 then
+  --       trainset_input[{i, {}}] = mimic2_input[{i, {}}]
+  --       trainset_target[i] = mimic2_target[i]
+  --     else
+  --       trainset_input[{i, {}}] = chal_input[{shuffle[i-(nSample_mimic2)], {}}]
+  --       trainset_target[i] = chal_target[shuffle[i-(nSample_mimic2)]]
+  --     end
+  --   end
+  --   -- Make test set: mimic2 + challenge2015
+  --   testset_input = torch.zeros(nTesting, inputSize)
+  --   testset_target = torch.zeros(nTesting, 1)
+  --   for i = 1, nTesting do
+  --     testset_input[{i, {}}] = chal_input[{shuffle[i+chal_nTraining], {}}]
+  --     testset_target[i] = chal_target[shuffle[i+chal_nTraining]]
+  --   end
+  -- elseif datatype == 'mimic+chal_small' then
+  --   local nSample_chal = chal_target:size(1)
+  --   local nSample_mimic2 = mimic2_target:size(1)
+  --
+  --   local chal_nTraining = chal_trainsize
+  --   nElement = nSample_chal + nSample_mimic2
+  --   nTesting = nSample_chal - chal_nTraining
+  --   nTraining = nElement - nTesting
+  --
+  --   local shuffle = torch.randperm(nSample_chal)
+  --
+  --   -- Make training set: mimic2 + challenge2015
+  --   local all_trainset_input = torch.zeros(nTraining, inputSize)
+  --   local all_trainset_target = torch.zeros(nTraining, 1)
+  --   for i = 1, nTraining do
+  --     if i <= nSample_mimic2 then
+  --       all_trainset_input[{i, {}}] = mimic2_input[{i, {}}]
+  --       all_trainset_target[i] = mimic2_target[i]
+  --     else
+  --       all_trainset_input[{i, {}}] = chal_input[{shuffle[i-(nSample_mimic2)], {}}]
+  --       all_trainset_target[i] = chal_target[shuffle[i-(nSample_mimic2)]]
+  --     end
+  --   end
+  --
+  --   local shuffle_all = torch.randperm(nTraining)
+  --
+  --   trainset_input = torch.zeros(chal_trainsize, inputSize)
+  --   trainset_target = torch.zeros(chal_trainsize, 1)
+  --   for i = 1, chal_trainsize do
+  --     trainset_input[{i, {}}] = all_trainset_input[{shuffle_all[i], {}}]
+  --     trainset_target[i] = all_trainset_target[shuffle_all[i]]
+  --   end
+  --
+  --   testset_input = torch.zeros(nTesting, inputSize)
+  --   testset_target = torch.zeros(nTesting, 1)
+  --   for i = 1, nTesting do
+  --     testset_input[{i, {}}] = chal_input[{shuffle[i+chal_nTraining], {}}]
+  --     testset_target[i] = chal_target[shuffle[i+chal_nTraining]]
+  --   end
+  --   nTraining = chal_trainsize
+  -- elseif datatype == 'mimic2_all' then
+  --
+  -- else
+  --   print("Wrong dataset type!")
+  --   do return end
+  -- end
+
+  -- return nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target
+-- end

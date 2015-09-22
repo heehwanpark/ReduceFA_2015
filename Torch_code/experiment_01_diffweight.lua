@@ -1,7 +1,7 @@
 require 'torch'
 require 'optim'
 
-function experiment_01(data_type, weight_seed)
+function experiment_01(data_type, db_seed, weight_seed)
   print '==> Processing options'
 
   cmd = torch.CmdLine()
@@ -22,7 +22,7 @@ function experiment_01(data_type, weight_seed)
   cmd:option('-mlplayer_num', 2)
   cmd:option('-nUnit_mlp', 500)
   -- Experiment Setting
-  cmd:option('-dbseed', 1)
+  cmd:option('-dbseed', db_seed)
   cmd:option('-weightseed', weight_seed)
   cmd:option('-batchsize', 10)
   cmd:option('-nFold', 5)
