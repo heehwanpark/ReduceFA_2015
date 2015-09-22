@@ -1,5 +1,17 @@
-chal_inputs = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v3.h5', '/inputs');
-chal_targets = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v3.h5', '/targets');
+clc;
+clear;
 
-mimic2_inputs = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_chal2015.h5', '/inputs');
-mimic2_targets = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_chal2015.h5', '/targets');
+conv01_origin = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/experiment_01/extract_conv_layer_conv_origin.h5','/conv1_weight');
+conv02_origin = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/experiment_01/extract_conv_layer_conv_origin.h5','/conv2_weight');
+
+conv01_weights = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/experiment_01/extract_conv_layer.h5','/conv1_weight');
+conv02_weights = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/experiment_01/extract_conv_layer.h5','/conv2_weight');
+
+c1_o = conv01_origin(:,:)';
+c1_100 = conv01_weights(:,:,100)';
+c1_200 = conv01_weights(:,:,200)';
+
+i = 50;
+X = 1:250;
+plot(X,c1_o(i,:),X,c1_100(i,:),X,c1_200(i,:))
+legend('origin','100','200')
