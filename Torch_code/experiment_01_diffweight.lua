@@ -1,7 +1,7 @@
 require 'torch'
 require 'optim'
 
-function experiment_01(data_type, db_seed, weight_seed)
+function experiment_01(ex_type, data_type, db_seed, weight_seed)
   print '==> Processing options'
 
   cmd = torch.CmdLine()
@@ -16,8 +16,8 @@ function experiment_01(data_type, db_seed, weight_seed)
   cmd:option('-nInputFeature', 1)
   cmd:option('-inputSize', 2500) -- 250Hz * 10sec
   --- For convolutional networks
-  cmd:option('-convlayer_num', 2)
-  cmd:option('-nFeatures_c', 50)
+  cmd:option('-convlayer_num', 3)
+  cmd:option('-nFeatures_c', 75)
   --- For MLP
   cmd:option('-mlplayer_num', 1)
   cmd:option('-nUnit_mlp', 500)
@@ -26,20 +26,20 @@ function experiment_01(data_type, db_seed, weight_seed)
   cmd:option('-weightseed', weight_seed)
   cmd:option('-batchsize', 30)
   cmd:option('-nFold', 5)
-  cmd:option('-maxIter', 200)
+  cmd:option('-maxIter', 300)
   cmd:option('-lr_sup', 0.001, 'Learning rate')
   cmd:option('-lrdecay',1e-5, 'Learning rate decay')
   cmd:option('-momentum', 0)
   cmd:option('-dropout_rate', 0.5)
   cmd:option('-pretraining', false)
   -- Conv Setting
-  cmd:option('-kernel', 250)
-  cmd:option('-pool', 4)
+  cmd:option('-kernel', 50)
+  cmd:option('-pool', 5)
   -- Torch Setting
   cmd:option('-thread', 16)
   -- File name
   cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/')
-  cmd:option('-filename', 'experiment_01/' .. 'extract_conv_layer')
+  cmd:option('-filename', 'experiment_01/'.. ex_type .. '/' .. data_type .. '_db_' .. db_seed .. '_init_' .. weight_seed)
 
   cmd:text()
   option = cmd:parse(arg or {})
@@ -49,6 +49,8 @@ function experiment_01(data_type, db_seed, weight_seed)
   require 'getLearningData'
 
   nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData(option)
+  print(trainset_input:size())
+  print(testset_input:size())
   ----------------------------------------------------------------------
   require 'buildCNNModel'
 
@@ -86,8 +88,8 @@ function experiment_01(data_type, db_seed, weight_seed)
   test_err = torch.zeros(option.maxIter, 1)
   test_conf = torch.zeros(option.maxIter, 4)
 
-  Conv_weight1 = torch.zeros(option.maxIter, option.nFeatures_c, option.kernel)
-  Conv_weight2 = torch.zeros(option.maxIter, option.nFeatures_c, option.nFeatures_c*option.kernel)
+  -- Conv_weight1 = torch.zeros(option.maxIter, option.nFeatures_c, option.kernel)
+  -- Conv_weight2 = torch.zeros(option.maxIter, option.nFeatures_c, option.nFeatures_c*option.kernel)
 
   Maxiter = option.maxIter
   ----------------------------------------------------------------------
@@ -101,11 +103,11 @@ function experiment_01(data_type, db_seed, weight_seed)
     train()
     test()
 
-    m1 = model.modules[1].weight:float()
-    m2 = model.modules[4].weight:float()
-
-    Conv_weight1[{iter,{},{}}] = m1
-    Conv_weight2[{iter,{},{}}] = m2
+    -- m1 = model.modules[1].weight:float()
+    -- m2 = model.modules[4].weight:float()
+    --
+    -- Conv_weight1[{iter,{},{}}] = m1
+    -- Conv_weight2[{iter,{},{}}] = m2
 
     iter = iter + 1
   end
@@ -116,7 +118,7 @@ function experiment_01(data_type, db_seed, weight_seed)
   recordfile:write('/test_accu', test_accu)
   recordfile:write('/test_err', test_err)
   recordfile:write('/test_confmatrix', test_conf)
-  recordfile:write('/conv1_weight', Conv_weight1)
-  recordfile:write('/conv2_weight', Conv_weight2)
+  -- recordfile:write('/conv1_weight', Conv_weight1)
+  -- recordfile:write('/conv2_weight', Conv_weight2)
   recordfile:close()
 end
