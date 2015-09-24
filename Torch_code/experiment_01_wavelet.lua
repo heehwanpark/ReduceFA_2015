@@ -55,7 +55,7 @@ local chal_target = chal_file:read('/targets'):all()
 chal_file:close()
 
 chal_input = chal_input:transpose(1,3)
-chal_target = chal_target:transpose(1,3)
+chal_target = chal_target:transpose(1,2)
 
 local mimic2_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v3.h5', 'r')
 local mimic2_input = mimic2_file:read('/wave_inputs'):all()
@@ -63,7 +63,7 @@ local mimic2_target = mimic2_file:read('/targets'):all()
 mimic2_file:close()
 
 mimic2_input = mimic2_input:transpose(1,3)
-mimic2_target = mimic2_target:transpose(1,3)
+mimic2_target = mimic2_target:transpose(1,2)
 
 -- Fix random seed
 torch.manualSeed(option.dbseed)
@@ -71,10 +71,9 @@ torch.manualSeed(option.dbseed)
 -- # of training elements in challenge 2015 set
 local chal_trainsize = 600
 local nEle_chal = chal_target:size(1)
-print(nEle_chal)
 local nEle_mimic2 = mimic2_target:size(1)
-print(nEle_mimic2)
 local shuffle = torch.randperm(nEle_chal)
+local inputSize = option.inputSize
 
 nTesting = nEle_chal - chal_trainsize
 testset_input = torch.zeros(nTesting, 4, inputSize)
@@ -85,7 +84,7 @@ for i = 1, nTesting do
 end
 
 nTraining = nEle_mimic2 + chal_trainsize
-trainset_input = torch.zeros(nTraining, inputSize)
+trainset_input = torch.zeros(nTraining, 4, inputSize)
 trainset_target = torch.zeros(nTraining, 1)
 for i = 1, nTraining do
   if i <= nEle_mimic2 then
@@ -154,7 +153,7 @@ function train()
     batchstart = (t-1)*batchsize+1
     for i = batchstart, batchstart+batchsize-1 do
       local input = trainset_input[{{shuffle_t[i], {}, {}}}]
-      print(input:size())
+      input = input[1]
       input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
       local target = trainset_target[shuffle_t[i]][1]+1
       table.insert(inputs, input)
@@ -202,7 +201,7 @@ function train()
 
   confusion:zero()
 end
-
+----------------------------------------------------------------------
 function test()
   local f = 0
   local time = sys.clock()
@@ -212,6 +211,7 @@ function test()
   print ('\n==> testing on test set:')
   for t = 1, nTesting do
     local input = testset_input[{{t, {}, {}}}]
+    input = input[1]
     input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
     local target = testset_target[t][1]+1
     local pred = model:forward(input)
@@ -239,8 +239,7 @@ function test()
 
   confusion:zero()
 end
-
-
+----------------------------------------------------------------------
 print '==> Start training'
 
 iter = 1
