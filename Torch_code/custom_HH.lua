@@ -34,6 +34,23 @@ function netsThrough(model, dataset)
   return outputs
 end
 
+function makeMax(dataset)
+  nEle = dataset:size(1)
+  old_inputSize = dataset:size(2)
+  max_window = option.max_window
+  new_inputSize = old_inputSize - max_window + 1
+
+  new_dataset = torch.zeros(nEle, new_inputSize)
+  for i = 1, nEle do
+    old_input = dataset[{i, {}}]
+    for j = 1, new_inputSize do
+      local val = torch.max(old_input[{{j,j+max_window-1}}])
+      new_dataset[i][j] = val
+    end
+  end
+
+  return new_dataset
+end
 -- function netsThrough(model, dataset)
 --   N = dataset:size(1)
 --   outputs = {}
