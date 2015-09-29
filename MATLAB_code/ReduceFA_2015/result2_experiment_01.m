@@ -21,9 +21,10 @@ for i = 1:3
 end
 
 figure
-plot(X,Y_accu(1,:),'-', X,Y_accu(2,:),'--', X,Y_accu(3,:),'-.')
-legend('01','04', '05')
+plot(X,Y_accu(1,:), X,Y_accu(2,:), X,Y_accu(3,:))
+legend({'vanilla', 'wavelet', 'max(50)'},'Location','northwest', 'FontSize', 12)
 
 figure
-plot(X,Y_err(1,:),'-', X,Y_err(2,:),'--', X,Y_err(3,:),'-.')
-legend('01','04', '05')
+plot(X,Y_err(1,:), X,Y_err(2,:), X,Y_err(3,:))
+legend({'vanilla', 'wavelet', 'max(50)'},'Location','northwest', 'FontSize', 12)
+ylim([0 2])

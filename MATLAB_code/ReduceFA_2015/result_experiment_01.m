@@ -22,9 +22,14 @@ for i = 1:5
 end
 
 figure
-plot(X,Y_accu(1,:),'-', X,Y_accu(2,:),'--', X,Y_accu(3,:),'-o', X,Y_accu(4,:),'-.', X,Y_accu(5,:),'-+')
-legend('1', '2', '5', '10', '25')
+plot(X,Y_accu(1,:), X,Y_accu(2,:), X,Y_accu(3,:), X,Y_accu(4,:), X,Y_accu(5,:))
+% legend({'chal(600)', 'mimic+chal(6348)', 'mimic+chal(600)', 'mimic2(5748)', 'mimic2(600)'},'Location','northwest', 'FontSize', 12)
+legend({'seed 1', 'seed 2', 'seed 5', 'seed 10', 'seed 25'},'Location','northwest', 'FontSize', 12)
+% legend('1', '2', '5', '10', '25')
 
 figure
-plot(X,Y_err(1,:),'-', X,Y_err(2,:),'--', X,Y_err(3,:),'-o', X,Y_err(4,:),'-.', X,Y_err(5,:),'-+')
-legend('1', '2', '5', '10', '25')
+plot(X,Y_err(1,:), X,Y_err(2,:), X,Y_err(3,:), X,Y_err(4,:), X,Y_err(5,:))
+% legend({'chal(600)', 'mimic+chal(6348)', 'mimic+chal(600)', 'mimic2(5748)', 'mimic2(600)'},'Location','northwest', 'FontSize', 12)
+legend({'seed 1', 'seed 2', 'seed 5', 'seed 10', 'seed 25'},'Location','northwest', 'FontSize', 12)
+% legend('1', '2', '5', '10', '25')
+ylim([0 1.5])

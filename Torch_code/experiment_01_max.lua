@@ -1,7 +1,7 @@
 require 'torch'
 require 'optim'
 
-function experiment_01(ex_type, data_type, db_seed, weight_seed)
+function experiment_01(ex_type, data_type, db_seed, weight_seed, max_window)
   print '==> Processing options'
 
   cmd = torch.CmdLine()
@@ -15,7 +15,7 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
   cmd:option('-nTarget', 2)
   cmd:option('-nInputFeature', 1)
   cmd:option('-inputSize', 2500) -- 250Hz * 10sec
-  cmd:option('-max_window', 50)
+  cmd:option('-max_window', max_window)
   --- For convolutional networks
   cmd:option('-convlayer_num', 3)
   cmd:option('-nFeatures_c', 75)
@@ -40,7 +40,7 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
   cmd:option('-thread', 16)
   -- File name
   cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/')
-  cmd:option('-filename', 'experiment_01/'.. ex_type .. '/' .. data_type .. '_db_' .. db_seed .. '_init_' .. weight_seed)
+  cmd:option('-filename', 'experiment_01/'.. ex_type .. '/' .. data_type .. '_db_' .. db_seed .. '_init_' .. weight_seed .. '_mw_' .. max_window)
 
   cmd:text()
   option = cmd:parse(arg or {})
