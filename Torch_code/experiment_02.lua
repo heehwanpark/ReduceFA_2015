@@ -1,7 +1,7 @@
 require 'torch'
 require 'optim'
 
-function experiment_01(ex_type, data_type, db_seed, weight_seed)
+function experiment_02(ex_type, data_type)
   print '==> Processing options'
 
   cmd = torch.CmdLine()
@@ -9,7 +9,7 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
   cmd:text('Reducing False Alarms using CNNs')
   cmd:text()
   cmd:text('Options:')
-  -- Data: 'chal', 'mimic+chal_all', 'mimic+chal_small'
+  -- Data: 'chal600', 'mimic600', 'chal300+mimic300', 'chal600+mimic600', 'chal600+mimic1200', 'chal600+mimic2400', 'chal600+mimicAll'
   cmd:option('-datatype', data_type)
   -- Model
   cmd:option('-nTarget', 2)
@@ -22,11 +22,11 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
   cmd:option('-mlplayer_num', 1)
   cmd:option('-nUnit_mlp', 500)
   -- Experiment Setting
-  cmd:option('-dbseed', db_seed)
-  cmd:option('-weightseed', weight_seed)
+  cmd:option('-dbseed', 1)
+  cmd:option('-weightseed', 1)
   cmd:option('-batchsize', 30)
   cmd:option('-nFold', 5)
-  cmd:option('-maxIter', 300)
+  cmd:option('-max_upIter', 30000) -- Update iteration, Not epoch
   cmd:option('-lr_sup', 0.001, 'Learning rate')
   cmd:option('-lrdecay',1e-5, 'Learning rate decay')
   cmd:option('-momentum', 0)
@@ -93,25 +93,18 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
 
   -- Conv_weight1 = torch.zeros(option.maxIter, option.nFeatures_c, option.kernel)
   -- Conv_weight2 = torch.zeros(option.maxIter, option.nFeatures_c, option.nFeatures_c*option.kernel)
-
-  Maxiter = option.maxIter
   ----------------------------------------------------------------------
   require 'training_cnn'
   require 'testing_cnn'
 
   print '==> Start training'
 
+  Maxiter = option.max_upIter % batchsize
+  print(Maxiter)
   iter = 1
   while iter <= Maxiter do
     train()
     test()
-
-    -- m1 = model.modules[1].weight:float()
-    -- m2 = model.modules[4].weight:float()
-    --
-    -- Conv_weight1[{iter,{},{}}] = m1
-    -- Conv_weight2[{iter,{},{}}] = m2
-
     iter = iter + 1
   end
   ----------------------------------------------------------------------
