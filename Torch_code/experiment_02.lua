@@ -26,7 +26,7 @@ function experiment_02(ex_type, data_type)
   cmd:option('-weightseed', 1)
   cmd:option('-batchsize', 30)
   cmd:option('-nFold', 5)
-  cmd:option('-max_upIter', 30000) -- Update iteration, Not epoch
+  cmd:option('-max_upIter', 22000) -- Update iteration, Not epoch
   cmd:option('-lr_sup', 0.001, 'Learning rate')
   cmd:option('-lrdecay',1e-5, 'Learning rate decay')
   cmd:option('-momentum', 0)
@@ -39,7 +39,7 @@ function experiment_02(ex_type, data_type)
   cmd:option('-thread', 16)
   -- File name
   cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/')
-  cmd:option('-filename', 'experiment_02/'.. ex_type .. '/' .. data_type .. '_db_' .. db_seed .. '_init_' .. weight_seed)
+  cmd:option('-filename', 'experiment_02/'.. ex_type .. '/' .. data_type)
 
   cmd:text()
   option = cmd:parse(arg or {})
@@ -84,33 +84,33 @@ function experiment_02(ex_type, data_type)
   parameters, gradParameters = model:getParameters()
   batchsize = option.batchsize
 
-  train_accu = torch.zeros(option.maxIter, 1)
-  train_err = torch.zeros(option.maxIter, 1)
+  -- train_accu = torch.zeros(option.max_upIter, 1)
+  -- train_err = torch.zeros(option.max_upIter, 1)
 
-  test_accu = torch.zeros(option.maxIter, 1)
-  test_err = torch.zeros(option.maxIter, 1)
-  test_conf = torch.zeros(option.maxIter, 4)
+  test_accu = torch.zeros(option.max_upIter, 1)
+  test_err = torch.zeros(option.max_upIter, 1)
+  test_conf = torch.zeros(option.max_upIter, 4)
 
   -- Conv_weight1 = torch.zeros(option.maxIter, option.nFeatures_c, option.kernel)
   -- Conv_weight2 = torch.zeros(option.maxIter, option.nFeatures_c, option.nFeatures_c*option.kernel)
   ----------------------------------------------------------------------
-  require 'training_cnn'
-  require 'testing_cnn'
+  require 'training_cnn_02'
 
   print '==> Start training'
 
-  Maxiter = option.max_upIter % batchsize
-  print(Maxiter)
+  iterPerEpoch = math.floor(nTraining/batchsize)
+  Maxiter = math.floor(option.max_upIter/iterPerEpoch)
+  print('==> # of max iteration: ' .. Maxiter)
   iter = 1
+  upIter = 1
   while iter <= Maxiter do
     train()
-    test()
     iter = iter + 1
   end
   ----------------------------------------------------------------------
   recordfile = hdf5.open(option.foldername .. option.filename .. '.h5', 'w')
-  recordfile:write('/train_accu', train_accu)
-  recordfile:write('/train_err', train_err)
+  -- recordfile:write('/train_accu', train_accu)
+  -- recordfile:write('/train_err', train_err)
   recordfile:write('/test_accu', test_accu)
   recordfile:write('/test_err', test_err)
   recordfile:write('/test_confmatrix', test_conf)
