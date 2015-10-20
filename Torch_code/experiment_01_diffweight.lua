@@ -39,7 +39,7 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
   cmd:option('-thread', 16)
   -- File name
   cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/')
-  cmd:option('-filename', 'experiment_02/'.. ex_type .. '/' .. data_type .. '_db_' .. db_seed .. '_init_' .. weight_seed)
+  cmd:option('-filename', 'experiment_01/'.. ex_type .. '/' .. data_type .. '_db_' .. db_seed .. '_init_' .. weight_seed)
 
   cmd:text()
   option = cmd:parse(arg or {})
@@ -47,10 +47,7 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
   torch.setnumthreads(option.thread)
   ----------------------------------------------------------------------
   require 'getLearningData'
-  require 'getLearningData_testmix'
-
-  -- nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData(option)
-  nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData_testmix(option)
+  nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData(option)
 
   print(trainset_input:size())
   print(testset_input:size())
@@ -111,6 +108,15 @@ function experiment_01(ex_type, data_type, db_seed, weight_seed)
     --
     -- Conv_weight1[{iter,{},{}}] = m1
     -- Conv_weight2[{iter,{},{}}] = m2
+
+    if iter == 154 then
+      print(testset_idx:size())
+      print(acc_list:size())
+      l = torch.cat(testset_idx, acc_list, 2)
+      faultfile = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/experiment_01/faultfile.h5', 'w')
+      faultfile:write('/list', l)
+      faultfile:close()
+    end
 
     iter = iter + 1
   end

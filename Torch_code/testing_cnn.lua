@@ -4,6 +4,8 @@ function test()
 
   model:evaluate()
 
+  acc_list = torch.zeros(nTesting)
+
   print ('\n==> testing on test set:')
   for t = 1, nTesting do
     local input = testset_input[{{t, {}}}]
@@ -13,6 +15,11 @@ function test()
     local err = criterion:forward(pred, target)
     f = f + err
     confusion:add(pred, target)
+
+    y,i_y = torch.max(pred,1)
+    if i_y[1] == target then
+      acc_list[t] = 1
+    end
   end
 
   time = sys.clock() - time

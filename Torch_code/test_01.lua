@@ -3,7 +3,7 @@ type_list = {'chal', 'mimic+chal_all', 'mimic+chal_small', 'mimic2_all', 'mimic2
 max_list = {50, 100, 150, 200, 250, 300}
 
 require 'experiment_01_diffweight'
-experiment_01('01_data', type_list[5], seed_list[1], seed_list[1])
+experiment_01('01_data', type_list[1], seed_list[1], seed_list[1])
 
 -- require 'experiment_01_max'
 -- for i = 1, 6 do

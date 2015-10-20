@@ -34,6 +34,7 @@ function getLearningData(option)
   local shuffle = torch.randperm(nEle_chal)
 
   nTesting = nEle_chal - chal_trainsize
+  testset_idx = shuffle[{{1,nTesting}}]
   testset_input = torch.zeros(nTesting, inputSize)
   testset_target = torch.zeros(nTesting, 1)
   for i = 1, nTesting do

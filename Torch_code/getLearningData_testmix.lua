@@ -39,7 +39,7 @@ function getLearningData_testmix(option)
   local shuffle_mimic = torch.randperm(nEle_mimic2)
   local testindex_mimic = shuffle_mimic[{{1,mimic_testsize}}]
   local trainindex_mimic = shuffle_mimic[{{mimic_testsize+1,-1}}]
-
+  -------------------------------------------------------------
   nTesting = chal_testsize + mimic_testsize
   testset_input = torch.zeros(nTesting, inputSize)
   testset_target = torch.zeros(nTesting, 1)
@@ -52,7 +52,15 @@ function getLearningData_testmix(option)
       testset_target[i] = mimic2_target[testindex_mimic[i-chal_testsize]]
     end
   end
-
+  -------------------------------------------------------------
+  -- nTesting = chal_testsize
+  -- testset_input = torch.zeros(nTesting, inputSize)
+  -- testset_target = torch.zeros(nTesting, 1)
+  -- for i = 1, nTesting do
+  --   testset_input[{i, {}}] = chal_input[{testindex_chal[i], {}}]
+  --   testset_target[i] = chal_target[testindex_chal[i]]
+  -- end
+  -------------------------------------------------------------
   -- Data: 'chal600', 'mimic600', 'chal300+mimic300', 'chal600+mimic600', 'chal600+mimic1200', 'chal600+mimic2400', 'chal600+mimicAll'
   if datatype == 'chal600' then
     nTraining = 600
@@ -64,6 +72,14 @@ function getLearningData_testmix(option)
     end
   elseif datatype == 'mimic600' then
     nTraining = 600
+    trainset_input = torch.zeros(nTraining, inputSize)
+    trainset_target = torch.zeros(nTraining, 1)
+    for i = 1, nTraining do
+      trainset_input[{i, {}}] = mimic2_input[{trainindex_mimic[i], {}}]
+      trainset_target[i] = mimic2_target[trainindex_mimic[i]]
+    end
+  elseif datatype == 'mimicAll' then
+    nTraining = nEle_mimic2 - 128
     trainset_input = torch.zeros(nTraining, inputSize)
     trainset_target = torch.zeros(nTraining, 1)
     for i = 1, nTraining do
