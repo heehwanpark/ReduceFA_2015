@@ -1,7 +1,7 @@
 require 'torch'
 require 'optim'
 
-function experiment_03(mlp_architecture, data_type)
+function experiment_03(mlp_architecture, data_type, maxmin_type)
   arch_str = '['
   for i = 1, table.getn(mlp_architecture) do
     if i == table.getn(mlp_architecture) then
@@ -32,30 +32,39 @@ function experiment_03(mlp_architecture, data_type)
   cmd:option('-dbseed', 1)
   cmd:option('-weightseed', 1)
   cmd:option('-batchsize', 30)
+  cmd:option('-maxmin_type', maxmin_type)
+  cmd:option('-maxmin_window', 50)
   cmd:option('-nFold', 5)
   cmd:option('-maxIter', 200)
   cmd:option('-lr_sup', 0.001, 'Learning rate')
   cmd:option('-lrdecay', 1e-5, 'Learning rate decay')
   cmd:option('-momentum', 0)
-  cmd:option('-dropout_rate', 1)
+  cmd:option('-dropout_rate', 0.5)
   -- Torch Setting
   cmd:option('-thread', 16)
   -- File name
   cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/dnn_output/')
-  cmd:option('-filename', arch_str .. '-' .. data_type)
+  cmd:option('-filename', arch_str .. '-' .. data_type .. '-' .. maxmin_type)
 
   cmd:text()
   option = cmd:parse(arg or {})
 
   torch.setnumthreads(option.thread)
   ----------------------------------------------------------------------
-  require 'getLearningData'
   require 'getLearningData_testmix'
-  require 'getLearningData_newidea'
 
-  -- nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData(option)
   nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData_testmix(option)
-  -- nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData_newidea(option)
+
+  require 'custom_HH'
+  if option.maxmin_type == 'max' then
+    trainset_input = makeMax(trainset_input)
+    testset_input = makeMax(testset_input)
+    option.inputSize = option.inputSize - option.maxmin_window + 1
+  elseif option.maxmin_type == 'min' then
+    trainset_input = makeMin(trainset_input)
+    testset_input = makeMin(testset_input)
+    option.inputSize = option.inputSize - option.maxmin_window + 1
+  end
 
   print(trainset_input:size())
   print(testset_input:size())
@@ -90,9 +99,11 @@ function experiment_03(mlp_architecture, data_type)
   batchsize = option.batchsize
   Maxiter = option.maxIter
 
-  test_accu = torch.zeros(Maxiter, 1)
-  test_err = torch.zeros(Maxiter, 1)
-  test_conf = torch.zeros(Maxiter, 4)
+  Maxupiter = Maxiter*math.floor(nTraining/batchsize)
+
+  test_accu = torch.zeros(Maxupiter, 1)
+  test_err = torch.zeros(Maxupiter, 1)
+  test_conf = torch.zeros(Maxupiter, 4)
   ----------------------------------------------------------------------
   require 'training_dnn'
   require 'testing_dnn'
@@ -101,10 +112,10 @@ function experiment_03(mlp_architecture, data_type)
 
   print('==> # of max iteration: ' .. Maxiter)
   iter = 1
-
+  upIter = 1
   while iter <= Maxiter do
     train()
-    test()
+    -- test()
     iter = iter + 1
   end
   ----------------------------------------------------------------------

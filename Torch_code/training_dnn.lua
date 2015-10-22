@@ -36,7 +36,7 @@ function train()
                       local df_do = criterion:backward(output, targets[i])
                       model:backward(inputs[i], df_do)
 
-                      confusion:add(output, targets[i])
+                      -- confusion:add(output, targets[i])
                     end
 
                     gradParameters:div(#inputs)
@@ -46,6 +46,10 @@ function train()
 
     _,fs = optimMethod(feval, parameters, optimState)
     cur_err = cur_err + fs[1]
+
+    test()
+    upIter = upIter + 1
+    model:training()
   end
 
   time = sys.clock() - time
@@ -53,9 +57,9 @@ function train()
 
   print("==> time to learn 1 sample = " .. (time*1000) .. 'ms')
 
-  print(confusion)
+  -- print(confusion)
   cur_err = cur_err/math.floor(nTraining/batchsize)
   print("==> current training error = " .. cur_err)
 
-  confusion:zero()
+  -- confusion:zero()
 end
