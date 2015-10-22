@@ -71,6 +71,8 @@ function experiment_02(ex_type, data_type)
 
   classes = {'False Alarm','True Alarm'}
   confusion = optim.ConfusionMatrix(classes)
+  -- require 'ConfusionMatrix_HH'
+  -- confusion = ConfusionMatrix_HH(classes)
   ----------------------------------------------------------------------
   print '==> configuring optimizer'
 

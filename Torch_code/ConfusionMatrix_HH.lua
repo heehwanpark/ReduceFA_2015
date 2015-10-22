@@ -45,9 +45,14 @@ function ConfusionMatrix_HH:add(prediction, target)
       self:_add(prediction, target)
    else
       self._prediction:resize(prediction:size()):copy(prediction)
+      print(self._prediction)
+      print(self._max)
       if type(target) == 'number' then
          -- prediction is a vector, then target assumed to be an index
-         self._max:max(self._pred_idx, self._prediction, 1)   
+         self._max:max(self._pred_idx, self._prediction, 1)
+         print(self._max)
+         print(self._pred_idx)
+         print(self._pred_idx[1])
          self:_add(self._pred_idx[1], target)
       else
          -- both prediction and target are vectors

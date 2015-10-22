@@ -32,6 +32,7 @@ function experiment_03(mlp_architecture, data_type)
   cmd:option('-dbseed', 1)
   cmd:option('-weightseed', 1)
   cmd:option('-batchsize', 30)
+  cmd:option('-maxmin_window', )
   cmd:option('-nFold', 5)
   cmd:option('-maxIter', 200)
   cmd:option('-lr_sup', 0.001, 'Learning rate')
@@ -49,13 +50,16 @@ function experiment_03(mlp_architecture, data_type)
 
   torch.setnumthreads(option.thread)
   ----------------------------------------------------------------------
-  require 'getLearningData'
   require 'getLearningData_testmix'
-  require 'getLearningData_newidea'
 
-  -- nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData(option)
   nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData_testmix(option)
-  -- nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData_newidea(option)
+
+  require 'custom_HH'
+
+  trainset_input = makeMax(trainset_input)
+  testset_input = makeMax(testset_input)
+
+  option.inputSize = option.inputSize - option.max_window + 1
 
   print(trainset_input:size())
   print(testset_input:size())
