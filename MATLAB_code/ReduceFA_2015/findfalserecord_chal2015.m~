@@ -20,7 +20,6 @@ for j = 1:length(fail_list)
     if fail_target(j) == 1
         subplot(6,2,k)
         plot(input_data(fail_list(j),:))
-        k = k+1;
     end
 end
 

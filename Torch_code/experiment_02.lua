@@ -33,13 +33,15 @@ function experiment_02(ex_type, data_type)
   cmd:option('-dropout_rate', 0.5)
   cmd:option('-pretraining', false)
   -- Conv Setting
-  cmd:option('-kernel', 250)
+  cmd:option('-kernel', 50)
   cmd:option('-pool', 2)
   -- Torch Setting
   cmd:option('-thread', 16)
   -- File name
-  cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/')
-  cmd:option('-filename', 'experiment_02/'.. ex_type .. '/' .. data_type)
+  cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/dnn_output/')
+  cmd:option('-filename', data_type)
+  -- cmd:option('-foldername', '/home/heehwan/Workspace/Data/ReduceFA_2015/cnn_output/weirdmimic/')
+  -- cmd:option('-filename', 'experiment_02/'.. ex_type .. '/' .. data_type)
 
   cmd:text()
   option = cmd:parse(arg or {})

@@ -16,6 +16,7 @@ function test()
     confusion:add(pred, target)
   end
 
+  confusion:updateValids()
   -- time = sys.clock() - time
   -- time = time / nTesting
   -- print("==> time to test 1 sample = " .. (time*1000) .. 'ms')
@@ -23,7 +24,7 @@ function test()
   -- print(confusion)
 
   f = f/nTesting
-
+  
   test_accu[upIter] = confusion.totalValid
   test_err[upIter] = f
   -- print("==> current testing error = " .. f)

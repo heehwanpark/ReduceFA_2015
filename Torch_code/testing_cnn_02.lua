@@ -12,7 +12,6 @@ function test()
     local target = testset_target[t][1]+1
     local pred = model:forward(input)
     local err = criterion:forward(pred, target)
-    print(err)
     f = f + err
     confusion:add(pred, target)
   end
