@@ -6,8 +6,7 @@ function buildModel(option)
 
   torch.manualSeed(option.net_init_seed)
   model = nn.Sequential()
-
-  if feature_ex_type == 'conv' then -- For convolutional networks
+  if option.feature_ex_type == 'conv' then -- For convolutional networks
     for i = 1, table.getn(option.conv_architecture) do
       if i == 1 then
         -- 1st convolution layer
@@ -26,21 +25,22 @@ function buildModel(option)
       end
     end
     n_feature_out = option.conv_architecture[table.getn(option.conv_architecture)]*nConvOut*1
-  elseif feature_ex_type == 'max' then
+  elseif option.feature_ex_type == 'max' then
     trainset_input = maxFilter(trainset_input)
     testset_input = maxFilter(testset_input)
     n_feature_out = option.inputSize - option.mwindow + 1
-  elseif feature_ex_type == 'min' then
+  elseif option.feature_ex_type == 'min' then
     trainset_input = minFilter(trainset_input)
     testset_input = minFilter(testset_input)
     n_feature_out = option.inputSize - option.mwindow + 1
-  elseif feature_ex_type == 'max-min' then
+  elseif option.feature_ex_type == 'max-min' then
     trainset_input = maxFilter(trainset_input)-minFilter(trainset_input)
     testset_input = maxFilter(testset_input)-minFilter(testset_input)
     n_feature_out = option.inputSize - option.mwindow + 1
+  else
+    print('Something wrong!')
   end
 
-  print(n_feature_out)
   -- Standard MLP
   model:add(nn.Reshape(n_feature_out))
   n_mlp_layer = table.getn(option.mlp_architecture)

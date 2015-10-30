@@ -34,7 +34,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   cmd:option('-mlp_architecture', mlp_architecture)
   cmd:option('-mlp_string', arch2string(mlp_architecture))
   ---- Feature extraction type
-  cmd:option('-feature_extract_type', feature_ex_type)
+  cmd:option('-feature_ex_type', feature_ex_type)
   if feature_ex_type == 'conv' then -- For convolutional networks
     cmd:option('-conv_architecture', conv_architecture)
     cmd:option('-conv_kernel', conv_kernel)
@@ -47,17 +47,20 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   cmd:option('-db_seed', db_seed)
   cmd:option('-net_init_seed', net_init_seed)
   cmd:option('-batchsize', batchsize)
-  cmd:option('-lr_sup', lr)
-  cmd:option('-lrdecay', lr_decay)
+  cmd:option('-lr', lr)
+  cmd:option('-lr_decay', lr_decay)
   cmd:option('-momentum', momentum)
   cmd:option('-dropout_rate', dropout_rate)
   cmd:text()
 
   option = cmd:parse(arg or {})
-  option.rundir = cmd:string('experiment', option, {dir=true})
-  paths.mkdir(option.rundir)
-  cmd:log(option.rundir .. '/log', option)
+
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/'
+  filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
+  option.rundir = cmd:string(foldername, option, {dir=true})
+  cmd:log(option.rundir .. filename .. '-log', option)
   ----------------------------------------------------------------------
+  print('\n')
   require 'getLearningData'
   nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target = getLearningData(option)
 
@@ -84,9 +87,6 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     iter = iter + 1
   end
   ----------------------------------------------------------------------
-  -- File name
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/'
-  filename = data_type .. '-' .. arch2string(mlp_architecture) .. '-' .. feature_extract_type
   recordfile = hdf5.open(foldername .. filename .. '.h5', 'w')
   recordfile:write('/test_accu', test_accu)
   recordfile:write('/test_err', test_err)

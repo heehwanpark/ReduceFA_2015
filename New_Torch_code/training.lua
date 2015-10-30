@@ -54,7 +54,7 @@ function training()
   end
 
   time = sys.clock() - time
-  print("==> time to learn 1 epoch = " .. (time*1000) .. 'ms')
+  print("==> time to learn " .. iter .. " epoch = " .. (time*1000) .. 'ms')
 
   -- print(confusion)
   cur_err = cur_err/math.floor(nTraining/batchsize)

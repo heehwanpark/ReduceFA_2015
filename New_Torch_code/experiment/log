@@ -1,4 +1,4 @@
-[program started on Thu Oct 29 13:46:15 2015] 
+[program started on Thu Oct 29 15:32:52 2015] 
 [command line arguments] 
 nInputFeature 1 
 net_init_seed 1 
@@ -15,18 +15,18 @@ db_seed 1
 max_upIter 42000 
 momentum 0 
 dropout_rate 0.5 
-mlp_architecture table: 0x40ddbd88 
+mlp_architecture table: 0x406fb7e0 
 mlp_string [500-500] 
-testdata_type chal+mimic 
+testdata_type chal 
 [----------------------] 
 ==> Load datasets 
 
- 6220
+ 6348
  2500
 [torch.LongStorage of size 2]
  
 
-  256
+  128
  2500
 [torch.LongStorage of size 2]
  
@@ -49,12 +49,12 @@ nn.Sequential {
 ==> configuring optimizer 
 ==> Defining training procedure 
 ==> Start training 
-==> # of max iteration: 202 
+==> # of max iteration: 199 
 
 ==> doing epoch on training data: 
 ==> online epoch # 1 [batchSize = 30] 
-==> time to learn 1 sample = 3.3367022440748ms 
-==> current training error = 0.69151440088468 
+==> time to learn 1 epoch = 12637.912034988ms 
+==> current training error = 0.69118482151773 
 
 ==> doing epoch on training data: 
 ==> online epoch # 2 [batchSize = 30] 
