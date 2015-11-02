@@ -1,6 +1,6 @@
 require 'torch'
 
-torch.setnumthreads(16)
+torch.setnumthreads(32)
 
 mlp_list = {{500}, {1000}, {500, 500}, {1000, 1000}, {500, 500, 500}}
 feature_list = {'conv', 'max', 'min', 'max-min'}
@@ -10,8 +10,11 @@ feature_list = {'conv', 'max', 'min', 'max-min'}
 --             net_init_seed, batchsize, lr, lr_decay, momentum, dropout_rate)
 
 require 'doExperiment'
-for i = 1, 5 do
-  for j = 2, 4 do
-    doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[i], feature_list[j])
-  end
-end
+
+doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[3], feature_list[4])
+
+-- for i = 1, 5 do
+--   for j = 2, 4 do
+--     doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[i], feature_list[j])
+--   end
+-- end

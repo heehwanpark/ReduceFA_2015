@@ -14,10 +14,10 @@ for i = 2:4
     Y_err = zeros(5,len);
     for j = 1:5
         mlp_type = mlp_list{j};
-        accu = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/' mlp_type '-' feature_type], '/test_accu');
-        err = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/' mlp_type '-' feature_type], '/test_err');
-        Y_accu(j,:) = accu;
-        Y_err(j,:) = err;
+        accu = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/' mlp_type '-' feature_type '.h5'], '/test_accu');
+        err = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/' mlp_type '-' feature_type '.h5'], '/test_err');
+        Y_accu(j,:) = accu(1:len);
+        Y_err(j,:) = err(1:len);
     end
     
     x_idx = 1:200:len;
@@ -39,8 +39,9 @@ for i = 2:4
         x_idx,s_Y_err(4,:),'-.', ...
         x_idx,s_Y_err(5,:),'-d');
     legend({'[500]', '[1000]', '[500-500]', '[1000-1000]', '[500-500-500]'}, 'Location','southeast', 'FontSize', 12)
+    title(feature_type)
     xlabel('Update iteration', 'FontSize', 12)
     ylabel('Negative log likelihood', 'FontSize', 12)
     xlim([0 40000])
-    ylim([0.25 1.25])
+    ylim([0.3 1])
 end

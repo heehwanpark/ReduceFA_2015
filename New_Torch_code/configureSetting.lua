@@ -25,6 +25,7 @@ function configureSetting(option)
 
   parameters, gradParameters = model:getParameters()
   batchsize = option.batchsize
-  max_upIter = option.max_upIter
-  max_iter = math.floor(max_upIter/math.floor(nTraining/batchsize))
+  max_iter = option.max_iter
+  -- max_upIter = option.max_upIter
+  -- max_iter = math.floor(max_upIter/math.floor(nTraining/batchsize))
 end

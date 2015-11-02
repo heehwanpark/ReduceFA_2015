@@ -43,7 +43,8 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     cmd:option('-mwindow', mwindow)
   end
   ---- Experiment Setting
-  cmd:option('-max_upIter', 42000) -- Update iteration, Not epoch
+  -- cmd:option('-max_upIter', 42000) -- Update iteration, Not epoch
+  cmd:option('-max_iter', 200)
   cmd:option('-db_seed', db_seed)
   cmd:option('-net_init_seed', net_init_seed)
   cmd:option('-batchsize', batchsize)
@@ -55,7 +56,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/'
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1102/'
   filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
   option.rundir = cmd:string(foldername, option, {dir=true})
   cmd:log(option.rundir .. filename .. '-log', option)
@@ -73,21 +74,30 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   require 'configureSetting'
   configureSetting(option)
   ----------------------------------------------------------------------
-  test_accu = torch.zeros(option.max_upIter, 1)
-  test_err = torch.zeros(option.max_upIter, 1)
-  test_conf = torch.zeros(option.max_upIter, 4)
+  train_accu = torch.zeros(max_iter, 1)
+  train_err = torch.zeros(max_iter, 1)
+
+  test_accu = torch.zeros(max_iter, 1)
+  test_err = torch.zeros(max_iter, 1)
+  test_conf = torch.zeros(max_iter, 4)
 
   require 'training'
+  require 'test'
+
   print('==> Start training')
   print('==> # of max iteration: ' .. max_iter)
   iter = 1
-  upiter = 1
+  -- upiter = 1
   while iter <= max_iter do
     training()
+    test()
+
     iter = iter + 1
   end
   ----------------------------------------------------------------------
   recordfile = hdf5.open(foldername .. filename .. '.h5', 'w')
+  recordfile:write('/train_accu', train_accu)
+  recordfile:write('/train_err', train_err)
   recordfile:write('/test_accu', test_accu)
   recordfile:write('/test_err', test_err)
   recordfile:write('/test_confmatrix', test_conf)
