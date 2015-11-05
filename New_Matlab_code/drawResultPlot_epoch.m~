@@ -1,0 +1,38 @@
+clc;
+clear;
+
+% 11/4
+mlp_list = {'[250-250]', '[500-500]', '[750-750]', '[1000-1000]', '[250-250-250]', '[500-500-500]', '[750-750-750]'};
+feature_list = {'mlp', 'max-min', 'max-min_x2', 'only_pool', 'only_pool_x2'};
+f_name = {'None', 'MAX-MIN', 'max-min_x2', 'only_pool', 'only_pool_x2'};
+
+max_iter = 200;
+
+for i = 1:length(feature_list)
+    feature_type = feature_list{i};
+    
+    X = 1:max_iter;
+    Y_accu = zeros(length(mlp_list),max_iter);
+    Y_err = zeros(length(mlp_list),max_iter);
+    for j = 1:length(mlp_list)
+        mlp_type = mlp_list{j};
+        accu = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1104/' mlp_type '-' feature_type '.h5'], '/test_accu');
+        err = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1104/' mlp_type '-' feature_type '.h5'], '/test_err');
+        Y_accu(j,:) = accu(1:max_iter);
+        Y_err(j,:) = err(1:max_iter);
+    end
+    
+    figure
+    plot(X,Y_err(1,:),'-o', ...
+        X,Y_err(2,:),'-+', ...
+        X,Y_err(3,:),'-*', ...
+        X,Y_err(4,:),'-.', ...
+        X,Y_err(5,:),'-x', ...
+        X,Y_err(6,:),'-s', ...
+        X,Y_err(7,:),'-d');
+    legend({'[250-250]', '[500-500]', '[750-750]', '[1000-1000]', '[250-250-250]', '[500-500-500]', '[750-750-750]'}, 'Location','southeast', 'FontSize', 12)
+    title(feature_type)
+    xlabel('Update iteration', 'FontSize', 12)
+    ylabel('Negative log likelihood', 'FontSize', 12)
+    ylim([0.4 1])
+end

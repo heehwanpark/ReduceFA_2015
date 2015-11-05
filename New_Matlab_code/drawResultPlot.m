@@ -14,8 +14,8 @@ for i = 2:4
     Y_err = zeros(5,len);
     for j = 1:5
         mlp_type = mlp_list{j};
-        accu = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/' mlp_type '-' feature_type '.h5'], '/test_accu');
-        err = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/' mlp_type '-' feature_type '.h5'], '/test_err');
+        accu = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1104/' mlp_type '-' feature_type '.h5'], '/test_accu');
+        err = h5read(['/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1104/' mlp_type '-' feature_type '.h5'], '/test_err');
         Y_accu(j,:) = accu(1:len);
         Y_err(j,:) = err(1:len);
     end

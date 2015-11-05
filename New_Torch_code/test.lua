@@ -10,7 +10,12 @@ function test()
     input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
     local target = testset_target[t][1]+1
     local pred = model:forward(input)
-    pred = pred[1]
+    -- conv vs linear, I don't know why yet
+    if option.feature_ex_type == 'conv' or option.feature_ex_type == 'mmconv'  then
+
+    else
+      pred = pred[1]
+    end
     local err = criterion:forward(pred, target)
     f = f + err
     confusion:add(pred, target)

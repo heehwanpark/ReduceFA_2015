@@ -39,8 +39,15 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     cmd:option('-conv_architecture', conv_architecture)
     cmd:option('-conv_kernel', conv_kernel)
     cmd:option('-conv_pool', conv_pool)
-  elseif feature_ex_type == 'max' or 'min' or 'max-min' then -- For Max-Min layers
+  elseif feature_ex_type == 'max' or feature_ex_type == 'min' or feature_ex_type == 'max-min' or feature_ex_type == 'mmpool' then -- For Max-Min layers
     cmd:option('-mwindow', mwindow)
+  elseif feature_ex_type == 'mmconv' then
+    cmd:option('-conv_architecture', conv_architecture)
+    cmd:option('-conv_kernel', conv_kernel)
+    cmd:option('-conv_pool', conv_pool)
+    cmd:option('-mwindow', mwindow)
+  else
+    print("Something Wrong!!!!!!!!!!!!!")
   end
   ---- Experiment Setting
   -- cmd:option('-max_upIter', 42000) -- Update iteration, Not epoch
@@ -56,7 +63,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1102/'
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1104/'
   filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
   option.rundir = cmd:string(foldername, option, {dir=true})
   cmd:log(option.rundir .. filename .. '-log', option)

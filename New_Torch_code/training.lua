@@ -30,7 +30,13 @@ function training()
                     local f = 0
                     for i = 1, #inputs do
                       local output = model:forward(inputs[i])
-                      output = output[1]
+                      -- conv vs linear, I don't know why yet
+                      if option.feature_ex_type == 'conv' or option.feature_ex_type == 'mmconv'  then
+
+                      else
+                        output = output[1]
+                      end
+
                       local err = criterion:forward(output, targets[i])
                       f = f + err
                       local df_do = criterion:backward(output, targets[i])
