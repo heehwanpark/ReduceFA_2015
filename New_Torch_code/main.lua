@@ -10,7 +10,6 @@ torch.setnumthreads(32)
 mlp_list = {{250, 250}, {500, 500}, {750, 750}, {1000, 1000}, {250, 250, 250}, {500, 500, 500}, {750, 750, 750}}
 feature_list = {'mlp', 'max-min', 'max-min_x2', 'only_pool', 'only_pool_x2'}
 
-
 -- doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_type,
 --             conv_architecture, conv_kernel, conv_pool, mwindow, db_seed,
 --             net_init_seed, batchsize, lr, lr_decay, momentum, dropout_rate)

@@ -4,6 +4,11 @@ function test()
 
   model:evaluate()
 
+  if iter == 81 then
+    pred_list = torch.zeros(nTesting, 1)
+    target_list = torch.zeros(nTesting, 1)
+  end
+
   print ('\n==> testing on test set:')
   for t = 1, nTesting do
     local input = testset_input[{{t, {}}}]
@@ -19,6 +24,12 @@ function test()
     local err = criterion:forward(pred, target)
     f = f + err
     confusion:add(pred, target)
+
+    if iter == 81 then
+      y,i_y = torch.max(pred,1)
+      pred_list[t] = i_y[1]
+      target_list[t] = target
+    end
   end
 
   time = sys.clock() - time

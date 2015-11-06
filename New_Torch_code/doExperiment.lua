@@ -63,7 +63,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1104/'
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1105/'
   filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
   option.rundir = cmd:string(foldername, option, {dir=true})
   cmd:log(option.rundir .. filename .. '-log', option)
@@ -101,6 +101,10 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
     iter = iter + 1
   end
+  ----------------------------------------------------------------------
+  test_result:write('/pred_list', pred_list)
+  test_result:write('/target_list', target_list)
+  test_result:close()
   ----------------------------------------------------------------------
   recordfile = hdf5.open(foldername .. filename .. '.h5', 'w')
   recordfile:write('/train_accu', train_accu)

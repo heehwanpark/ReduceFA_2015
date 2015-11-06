@@ -41,6 +41,10 @@ function getLearningData(option)
     mimic_testsize = 0
     trainindex_mimic = shuffle_mimic
   end
+
+  test_result = hdf5.open(foldername .. filename .. '_test_result.h5', 'w')
+  test_result:write('/testindex_chal', testindex_chal)
+  test_result:write('/testindex_mimic', testindex_mimic)
   -------------------------------------------------------------
   nTesting = chal_testsize + mimic_testsize
   testset_input = torch.zeros(nTesting, option.inputSize)
