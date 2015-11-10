@@ -2,10 +2,14 @@ clc;
 clear;
 
 % 11/4
-mlp_list = {'[250-250]', '[500-500]', '[750-750]', '[1000-1000]', '[250-250-250]', '[500-500-500]', '[750-750-750]'};
-feature_list = {'conv', 'mmconv', 'mlp', 'max-min', 'max-min_x2', 'only_pool', 'only_pool_x2', 'mmpool'};
-f_name = {'Convolutional', '(MAX-MIN)-Conv', 'None', 'MAX-MIN', 'MAX-MIN x2', 'only pooling', 'only pooling x2', '(MAX-MIN)-pooling'};
+% mlp_list = {'[250-250]', '[500-500]', '[750-750]', '[1000-1000]', '[250-250-250]', '[500-500-500]', '[750-750-750]'};
+% feature_list = {'conv', 'mmconv', 'mlp', 'max-min', 'max-min_x2', 'only_pool', 'only_pool_x2', 'mmpool'};
+% f_name = {'Convolutional', '(MAX-MIN)-Conv', 'None', 'MAX-MIN', 'MAX-MIN x2', 'only pooling', 'only pooling x2', '(MAX-MIN)-pooling'};
 
+% 11/10
+mlp_list = '[500]';
+feature_list = {'true-conv','false-conv'};
+f_name = {'Random init', 'Art init'};
 max_iter = 200;
 
 % for i = 1:length(feature_list)

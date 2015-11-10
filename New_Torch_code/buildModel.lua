@@ -25,6 +25,16 @@ function buildModel(option)
       end
     end
     n_feature_out = option.conv_architecture[table.getn(option.conv_architecture)]*nConvOut*1
+
+    if option.artificial_weight then
+      local art_weight_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1106/artificial_kernel_v1.h5', 'r')
+      local weight = art_weight_file:read('/weight'):all()
+      weight = weight:transpose(1,2)
+      print(weight:size())
+      print(model.modules[1].weight[{1,{}}])
+      model.modules[1].weight[{{1,48}, {}}] = weight*1e-4
+      print(model.modules[1].weight[{1,{}}])
+    end
   elseif option.feature_ex_type == 'only_pool' then
     local pool_size = 2
     model:add(nn.SpatialMaxPooling(1, pool_size))

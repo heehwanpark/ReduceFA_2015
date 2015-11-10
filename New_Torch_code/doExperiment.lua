@@ -5,7 +5,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
                       lr, lr_decay, momentum, dropout_rate)
   -- Optional values
   conv_architecture = conv_architecture or {75, 75, 75}
-  conv_kernel = conv_kernel or 50
+  conv_kernel = conv_kernel or 139
   conv_pool = conv_pool or 2
   mwindow = mwindow or 50
   db_seed = db_seed or 1
@@ -39,6 +39,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     cmd:option('-conv_architecture', conv_architecture)
     cmd:option('-conv_kernel', conv_kernel)
     cmd:option('-conv_pool', conv_pool)
+    cmd:option('-artificial_weight', false)
   elseif feature_ex_type == 'max' or feature_ex_type == 'min' or feature_ex_type == 'max-min' or feature_ex_type == 'mmpool' then -- For Max-Min layers
     cmd:option('-mwindow', mwindow)
   elseif feature_ex_type == 'mmconv' then
@@ -63,8 +64,17 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1105/'
-  filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/'
+  if option.feature_ex_type == 'conv' then
+    if option.artificial_weight then
+      filename = arch2string(mlp_architecture) .. '-true-' .. feature_ex_type
+    else
+      filename = arch2string(mlp_architecture) .. '-false-' .. feature_ex_type
+    end
+  else
+    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
+  end
+  print(filename)
   option.rundir = cmd:string(foldername, option, {dir=true})
   cmd:log(option.rundir .. filename .. '-log', option)
   ----------------------------------------------------------------------
@@ -113,4 +123,11 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   recordfile:write('/test_err', test_err)
   recordfile:write('/test_confmatrix', test_conf)
   recordfile:close()
+  if option.feature_ex_type == 'conv' then
+    if option.artificial_weight then
+      torch.save(foldername .. 'art_init_model.net', model)
+    else
+      torch.save(foldername .. 'rand_init_model.net', model)
+    end
+  end
 end
