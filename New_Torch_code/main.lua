@@ -17,7 +17,7 @@ feature_list = {'mlp', 'max-min', 'max-min_x2', 'only_pool', 'only_pool_x2'}
 require 'doExperiment'
 
 -- type 1
-doExperiment('chal600+mimicAll', 'chal+mimic', {500}, 'conv')
+-- doExperiment('chal600+mimicAll', 'chal+mimic', {500}, 'conv')
 
 -- type 2
 -- for i = 1, table.getn(mlp_list) do
@@ -27,6 +27,6 @@ doExperiment('chal600+mimicAll', 'chal+mimic', {500}, 'conv')
 -- end
 
 -- type 3
--- for i = 1, table.getn(mlp_list) do
---   doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[i], 'conv')
--- end
+for i = 1, table.getn(mlp_list) do
+  doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[i], 'gauss')
+end

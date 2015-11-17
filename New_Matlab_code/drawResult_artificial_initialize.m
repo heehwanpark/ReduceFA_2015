@@ -4,7 +4,7 @@ clear;
 % 11/10
 mlp_type = '[500]';
 feature_list = {'true-conv','false-conv'};
-f_name = {'Random init', 'Art init'};
+f_name = {'Artificial init','Random init'};
 max_iter = 200;
 
 X = 1:max_iter;
@@ -37,49 +37,68 @@ ylim([0.3 1])
 
 %%
 
-inputs = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/conv_through.h5', '/inputs');
+inputs = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/art_init_model_through.h5', '/inputs');
 inputs = inputs';
 
-outputs1 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/conv_through.h5', '/outputs1');
+outputs1 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/art_init_model_through.h5', '/outputs1');
 outputs1 = permute(outputs1,[3 2 1]);
 
-outputs2 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/conv_through.h5', '/outputs2');
+outputs2 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/art_init_model_through.h5', '/outputs2');
 outputs2 = permute(outputs2,[3 2 1]);
 
-outputs3 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/conv_through.h5', '/outputs3');
+outputs3 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/art_init_model_through.h5', '/outputs3');
 outputs3 = permute(outputs3,[3 2 1]);
 
 inputs_1 = inputs(2,:);
 outputs1_1 = squeeze(outputs1(2,:,:));
-outputs2_1 = squeeze(outputs2(2,:,:));
+% outputs2_1 = squeeze(outputs2(1,:,:));
 outputs3_1 = squeeze(outputs3(2,:,:));
 
 figure
+plot(inputs_1)
+
+kernel_list = [1,5,12,21,24,50,55,60,65,70];
+
+figure
 for i=1:10
     subplot(5,2,i)
-    if i <= 5
-        plot(outputs1_1(i,:))
-    else
-        plot(outputs1_1(i+50,:))
-    end
+    plot(outputs1_1(kernel_list(i),:))
 end
 
 figure
 for i=1:10
     subplot(5,2,i)
-    if i <= 5
-        plot(outputs2_1(i,:))
-    else
-        plot(outputs2_1(i+50,:))
-    end
+    plot(outputs3_1(kernel_list(i),:))
 end
 
+% figure
+% for i=1:10
+%     subplot(5,2,i)
+%     if i <= 5
+%         plot(outputs2_1(i,:))
+%     else
+%         plot(outputs2_1(i+50,:))
+%     end
+% end
+% 
+% figure
+% for i=1:10
+%     subplot(5,2,i)
+%     if i <= 5
+%         plot(outputs3_1(i,:))
+%     else
+%         plot(outputs3_1(i+50,:))
+%     end
+% end
+
+%% kernels
+art_weight_1 = h5read('/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/kernelFromModel.h5', '/art_weight_1');
+art_weight_1 = art_weight_1';
+
+kernel_list = [1,5,12,21,24,50,55,60,65,70];
 figure
-for i=1:10
+title('Kernels')
+for i = 1:10
     subplot(5,2,i)
-    if i <= 5
-        plot(outputs3_1(i,:))
-    else
-        plot(outputs3_1(i+50,:))
-    end
+    plot(art_weight_1(kernel_list(i),:))
 end

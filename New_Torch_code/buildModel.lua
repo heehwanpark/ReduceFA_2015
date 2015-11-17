@@ -66,7 +66,7 @@ function buildModel(option)
     trainset_input = maxFilter(trainset_input)-minFilter(trainset_input)
     testset_input = maxFilter(testset_input)-minFilter(testset_input)
     n_feature_out = n_feature_out - option.mwindow + 1
-  elseif option.feature_ex_type == 'mlp' then
+  elseif option.feature_ex_type == 'mlp' or option.feature_ex_type == 'gauss' then
     n_feature_out = option.inputSize
   elseif option.feature_ex_type == 'mmpool' then
     trainset_input = maxFilter(trainset_input)-minFilter(trainset_input)

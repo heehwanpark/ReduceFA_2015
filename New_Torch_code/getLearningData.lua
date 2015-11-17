@@ -6,7 +6,11 @@ function getLearningData(option)
 
   print '==> Load datasets'
 
-  local chal_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_chal2015.h5', 'r')
+  if option.feature_ex_type == 'gauss' then
+    chal_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_chal2015_gauss.h5', 'r')
+  else
+    chal_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_chal2015.h5', 'r')
+  end
   local chal_input = chal_file:read('/inputs'):all()
   local chal_target = chal_file:read('/targets'):all()
   chal_file:close()
@@ -14,7 +18,11 @@ function getLearningData(option)
   chal_input = chal_input:transpose(1,2)
   chal_target = chal_target:transpose(1,2)
 
-  local mimic2_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v3.h5', 'r')
+  if option.feature_ex_type == 'gauss' then
+    mimic2_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_gauss.h5', 'r')
+  else
+    mimic2_file = hdf5.open('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_v3.h5', 'r')
+  end
   local mimic2_input = mimic2_file:read('/inputs'):all()
   local mimic2_target = mimic2_file:read('/targets'):all()
   mimic2_file:close()
@@ -44,8 +52,14 @@ function getLearningData(option)
 
   test_result = hdf5.open(foldername .. filename .. '_test_result.h5', 'w')
   test_result:write('/testindex_chal', testindex_chal)
-  test_result:write('/testindex_mimic', testindex_mimic)
+  if testdata_type == 'chal+mimic' then
+    test_result:write('/testindex_mimic', testindex_mimic)
+  end
   -------------------------------------------------------------
+  if option.feature_ex_type == 'gauss' then
+    option.inputSize = chal_input:size(2)
+  end
+
   nTesting = chal_testsize + mimic_testsize
   testset_input = torch.zeros(nTesting, option.inputSize)
   testset_target = torch.zeros(nTesting, 1)
@@ -72,6 +86,14 @@ function getLearningData(option)
         trainset_input[{i, {}}] = mimic2_input[{trainindex_mimic[idx], {}}]
         trainset_target[i] = mimic2_target[trainindex_mimic[idx]]
       end
+    end
+  elseif trdata_type == 'chal600' then
+    nTraining = nEle_chal-chal_testsize;
+    trainset_input = torch.zeros(nTraining, option.inputSize)
+    trainset_target = torch.zeros(nTraining, 1)
+    for i = 1, nTraining do
+      trainset_input[{i, {}}] = chal_input[{trainindex_chal[i], {}}]
+      trainset_target[i] = chal_target[trainindex_chal[i]]
     end
   else
     print("Wrong dataset type!")

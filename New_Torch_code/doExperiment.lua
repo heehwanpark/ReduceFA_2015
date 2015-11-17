@@ -4,9 +4,9 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
                       conv_kernel, conv_pool, mwindow, db_seed, net_init_seed, batchsize,
                       lr, lr_decay, momentum, dropout_rate)
   -- Optional values
-  conv_architecture = conv_architecture or {75, 75, 75}
-  conv_kernel = conv_kernel or 139
-  conv_pool = conv_pool or 2
+  conv_architecture = conv_architecture or {75, 75, 75, 75}
+  conv_kernel = conv_kernel or 50
+  conv_pool = conv_pool or 3
   mwindow = mwindow or 50
   db_seed = db_seed or 1
   net_init_seed = net_init_seed or 1
@@ -40,7 +40,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     cmd:option('-conv_kernel', conv_kernel)
     cmd:option('-conv_pool', conv_pool)
     cmd:option('-artificial_weight', false)
-  elseif feature_ex_type == 'max' or feature_ex_type == 'min' or feature_ex_type == 'max-min' or feature_ex_type == 'mmpool' then -- For Max-Min layers
+  elseif feature_ex_type == 'max' or feature_ex_type == 'min' or feature_ex_type == 'max-min' or feature_ex_type == 'mmpool' or feature_ex_type == 'gauss' then -- For Max-Min layers
     cmd:option('-mwindow', mwindow)
   elseif feature_ex_type == 'mmconv' then
     cmd:option('-conv_architecture', conv_architecture)
@@ -64,7 +64,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1109/'
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1117/'
   if option.feature_ex_type == 'conv' then
     if option.artificial_weight then
       filename = arch2string(mlp_architecture) .. '-true-' .. feature_ex_type
