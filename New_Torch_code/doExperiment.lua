@@ -64,15 +64,15 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1117/'
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1203/'
   if option.feature_ex_type == 'conv' then
     if option.artificial_weight then
-      filename = arch2string(mlp_architecture) .. '-true-' .. feature_ex_type
+      filename = arch2string(mlp_architecture) .. '-true-' .. feature_ex_type .. '-seed-' .. db_seed
     else
-      filename = arch2string(mlp_architecture) .. '-false-' .. feature_ex_type
+      filename = arch2string(mlp_architecture) .. '-false-' .. feature_ex_type .. '-seed-' .. db_seed
     end
   else
-    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
+    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type .. '-seed-' .. db_seed
   end
   print(filename)
   option.rundir = cmd:string(foldername, option, {dir=true})
@@ -104,12 +104,20 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   print('==> Start training')
   print('==> # of max iteration: ' .. max_iter)
   iter = 1
+
+  if option.feature_ex_type == 'conv' and option.db_seed == 1 then
+    torch.save(foldername .. filename .. '-initial_model.net', model)
+  end
   -- upiter = 1
   while iter <= max_iter do
     training()
     test()
 
     iter = iter + 1
+  end
+
+  if option.feature_ex_type == 'conv' and option.db_seed == 1 then
+    torch.save(foldername .. filename .. '-trained_model.net', model)
   end
   ----------------------------------------------------------------------
   test_result:write('/pred_list', pred_list)
@@ -123,11 +131,11 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   recordfile:write('/test_err', test_err)
   recordfile:write('/test_confmatrix', test_conf)
   recordfile:close()
-  if option.feature_ex_type == 'conv' then
-    if option.artificial_weight then
-      torch.save(foldername .. 'art_init_model.net', model)
-    else
-      torch.save(foldername .. 'rand_init_model.net', model)
-    end
-  end
+  -- if option.feature_ex_type == 'conv' then
+  --   if option.artificial_weight then
+  --     torch.save(foldername .. 'art_init_model.net', model)
+  --   else
+  --     torch.save(foldername .. 'rand_init_model.net', model)
+  --   end
+  -- end
 end

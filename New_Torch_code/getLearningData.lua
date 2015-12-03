@@ -63,16 +63,29 @@ function getLearningData(option)
   nTesting = chal_testsize + mimic_testsize
   testset_input = torch.zeros(nTesting, option.inputSize)
   testset_target = torch.zeros(nTesting, 1)
+
+  testnum_chal = 0
+  testnum_mimic = 0
   for i = 1, nTesting do
     if i <= chal_testsize then
       testset_input[{i, {}}] = chal_input[{testindex_chal[i], {}}]
       testset_target[i] = chal_target[testindex_chal[i]]
+      testnum_chal = testnum_chal + chal_target[testindex_chal[i]][1]
     else
       testset_input[{i, {}}] = mimic2_input[{testindex_mimic[i-chal_testsize], {}}]
       testset_target[i] = mimic2_target[testindex_mimic[i-chal_testsize]]
+      testnum_mimic = testnum_mimic + mimic2_target[testindex_mimic[i-chal_testsize]][1]
     end
   end
+
+  print('==> test num')
+  print(testnum_chal)
+  print(testnum_mimic)
   -------------------------------------------------------------
+
+  trnum_chal = 0
+  trnum_mimic = 0
+
   if trdata_type == 'chal600+mimicAll' then
     nTraining = (nEle_chal-chal_testsize) + (nEle_mimic2-mimic_testsize)
     trainset_input = torch.zeros(nTraining, option.inputSize)
@@ -81,10 +94,12 @@ function getLearningData(option)
       if i <= (nEle_chal-chal_testsize) then
         trainset_input[{i, {}}] = chal_input[{trainindex_chal[i], {}}]
         trainset_target[i] = chal_target[trainindex_chal[i]]
+        trnum_chal = trnum_chal + chal_target[trainindex_chal[i]][1]
       else
         local idx = i-(nEle_chal-chal_testsize)
         trainset_input[{i, {}}] = mimic2_input[{trainindex_mimic[idx], {}}]
         trainset_target[i] = mimic2_target[trainindex_mimic[idx]]
+        trnum_mimic = trnum_mimic + mimic2_target[trainindex_mimic[idx]][1]
       end
     end
   elseif trdata_type == 'chal600' then
@@ -99,5 +114,8 @@ function getLearningData(option)
     print("Wrong dataset type!")
     do return end
   end
+  print('==> train num')
+  print(trnum_chal)
+  print(trnum_mimic)
   return nTraining, trainset_input, trainset_target, nTesting, testset_input, testset_target
 end

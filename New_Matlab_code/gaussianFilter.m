@@ -27,22 +27,28 @@ end
 X = 1:nn;
 
 figure
-ax1_1 = subplot(2,1,1);
-ax1_2 = subplot(2,1,2);
+ax1_1 = subplot(3,1,1);
+ax1_2 = subplot(3,1,2);
+ax1_3 = subplot(3,1,3);
 
 figure
-ax2_1 = subplot(2,1,1);
-ax2_2 = subplot(2,1,2);
+ax2_1 = subplot(3,1,1);
+ax2_2 = subplot(3,1,2);
+ax2_3 = subplot(3,1,3);
 
-plot(ax1_1, 1:2500, chal_inputs(9,:));
+plot(ax1_1, 1:2500, chal_inputs(1,:));
 title(ax1_1, 'Original ECG');
-plot(ax1_2, X, maxmin_inputs(9,:));
+plot(ax1_2, X, maxmin_inputs(1,:));
 title(ax1_2, 'After MAX-MIN layer');
+plot(ax1_3, X, gauss_inputs(1,:));
+title(ax1_3, 'After Gaussian layer');
 
 plot(ax2_1, 1:2500, chal_inputs(9,:));
 title(ax2_1, 'Original ECG');
-plot(ax2_2, X, gauss_inputs(9,:));
-title(ax2_2, 'After Gaussian layer');
+plot(ax2_2, X, maxmin_inputs(9,:));
+title(ax2_2, 'After MAX-MIN layer');
+plot(ax2_3, X, gauss_inputs(9,:));
+title(ax2_3, 'After Gaussian layer');
 
 % h5create('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_gauss.h5','/inputs',size(new_inputs));
 % h5write('/home/heehwan/Workspace/Data/ReduceFA_2015/cnndb_mimic2_gauss.h5','/inputs',new_inputs);
