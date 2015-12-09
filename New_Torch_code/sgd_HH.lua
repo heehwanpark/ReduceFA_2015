@@ -83,7 +83,7 @@ function optim.sgd_HH(opfunc, x, config, state)
 
    -- (HeeHwan) Add gausssian noise
    gauss_noise = torch.randn(x:size(1)):cuda()
-   x:add(gauss_noise)
+   x:add(lr, gauss_noise)
 
    -- (6) update evaluation counter
    state.evalCounter = state.evalCounter + 1
