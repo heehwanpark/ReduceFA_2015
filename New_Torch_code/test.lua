@@ -4,15 +4,18 @@ function test()
 
   model:evaluate()
 
-  if iter == 81 then
-    pred_list = torch.zeros(nTesting, 1)
-    target_list = torch.zeros(nTesting, 1)
-  end
+  -- if iter == 81 then
+  --   pred_list = torch.zeros(nTesting, 1)
+  --   target_list = torch.zeros(nTesting, 1)
+  -- end
 
   print ('\n==> testing on test set:')
   for t = 1, nTesting do
     local input = testset_input[{{t, {}}}]
-    input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
+    input = torch.reshape(input, input:size(1), input:size(2), 1)
+    if option.cuda then
+      input = input:cuda()
+    end
     local target = testset_target[t][1]+1
     local pred = model:forward(input)
     -- conv vs linear, I don't know why yet
@@ -25,11 +28,11 @@ function test()
     f = f + err
     confusion:add(pred, target)
 
-    if iter == 81 then
-      y,i_y = torch.max(pred,1)
-      pred_list[t] = i_y[1]
-      target_list[t] = target
-    end
+    -- if iter == 81 then
+    --   y,i_y = torch.max(pred,1)
+    --   pred_list[t] = i_y[1]
+    --   target_list[t] = target
+    -- end
   end
 
   time = sys.clock() - time

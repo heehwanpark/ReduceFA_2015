@@ -16,8 +16,11 @@ feature_list = {'mlp', 'max-min', 'max-min_x2', 'only_pool', 'only_pool_x2'}
 
 require 'doExperiment'
 
+-- 12/3
+weight_list = {{0.5, 0.5}, {0.4, 0.6}, {0.3, 0.7}, {0.2, 0.8}, {0.15, 0.85}, {0.1, 0.9}}
+
 -- type 1
--- doExperiment('chal600+mimicAll', 'chal+mimic', {500}, 'conv')
+doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv')
 
 -- type 2
 -- for i = 1, table.getn(mlp_list) do
@@ -27,13 +30,18 @@ require 'doExperiment'
 -- end
 
 -- type 3
-for i = 1, table.getn(mlp_list) do
-  doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[i], 'conv')
-end
+-- for i = 1, table.getn(mlp_list) do
+--   doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[i], 'conv')
+-- end
 
 -- 11/25
 -- db_seed_list = {1,2,3,5,7,11,13,17,19,23}
 -- for i = 1, table.getn(db_seed_list) do
 --   doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[3], 'max-min', nil, nil, nil, nil, db_seed_list[i])
 --   doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv', nil, nil, nil, nil, db_seed_list[i])
+-- end
+
+-- 12/03
+-- for i = 1, table.getn(weight_list) do
+  -- doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[3], 'max-min', nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, weight_list[i])
 -- end

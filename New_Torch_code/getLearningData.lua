@@ -50,11 +50,11 @@ function getLearningData(option)
     trainindex_mimic = shuffle_mimic
   end
 
-  test_result = hdf5.open(foldername .. filename .. '_test_result.h5', 'w')
-  test_result:write('/testindex_chal', testindex_chal)
-  if testdata_type == 'chal+mimic' then
-    test_result:write('/testindex_mimic', testindex_mimic)
-  end
+  -- test_result = hdf5.open(foldername .. filename .. '_test_result.h5', 'w')
+  -- test_result:write('/testindex_chal', testindex_chal)
+  -- if testdata_type == 'chal+mimic' then
+  --   test_result:write('/testindex_mimic', testindex_mimic)
+  -- end
   -------------------------------------------------------------
   if option.feature_ex_type == 'gauss' then
     option.inputSize = chal_input:size(2)

@@ -14,7 +14,10 @@ function training()
     batchstart = (t-1)*batchsize+1
     for i = batchstart, batchstart+batchsize-1 do
       local input = trainset_input[{{shuffle_t[i], {}}}]
-      input = torch.reshape(input, input:size(1), input:size(2), 1):cuda()
+      input = torch.reshape(input, input:size(1), input:size(2), 1)
+      if option.cuda then
+        input = input:cuda()
+      end
       local target = trainset_target[shuffle_t[i]][1]+1
       table.insert(inputs, input)
       table.insert(targets, target)

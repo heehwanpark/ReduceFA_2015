@@ -118,7 +118,10 @@ function buildModel(option)
 
   model:add(nn.Linear(option.mlp_architecture[n_mlp_layer], option.nTarget))
   model:add(nn.LogSoftMax())
-  model:cuda()
+
+  if option.cuda then
+    model:cuda()
+  end
 
   print(model)
   return model

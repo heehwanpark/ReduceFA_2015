@@ -2,7 +2,7 @@ require 'custom'
 
 function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_type, conv_architecture,
                       conv_kernel, conv_pool, mwindow, db_seed, net_init_seed, batchsize,
-                      lr, lr_decay, momentum, dropout_rate)
+                      lr, lr_decay, momentum, dropout_rate, class_weight)
   -- Optional values
   conv_architecture = conv_architecture or {75, 75, 75, 75}
   conv_kernel = conv_kernel or 50
@@ -15,6 +15,7 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   lr_decay = lr_decay or 1e-5
   momentum = momentum or 0
   dropout_rate = dropout_rate or 0.5
+  class_weight = class_weight or false
 
   -- Experiment option
   print '==> Processing options'
@@ -39,7 +40,6 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     cmd:option('-conv_architecture', conv_architecture)
     cmd:option('-conv_kernel', conv_kernel)
     cmd:option('-conv_pool', conv_pool)
-    cmd:option('-artificial_weight', false)
   elseif feature_ex_type == 'max' or feature_ex_type == 'min' or feature_ex_type == 'max-min' or feature_ex_type == 'mmpool' or feature_ex_type == 'gauss' then -- For Max-Min layers
     cmd:option('-mwindow', mwindow)
   elseif feature_ex_type == 'mmconv' then
@@ -47,6 +47,8 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     cmd:option('-conv_kernel', conv_kernel)
     cmd:option('-conv_pool', conv_pool)
     cmd:option('-mwindow', mwindow)
+  elseif feature_ex_type == 'mlp' then
+    -- do nothing
   else
     print("Something Wrong!!!!!!!!!!!!!")
   end
@@ -60,17 +62,21 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   cmd:option('-lr_decay', lr_decay)
   cmd:option('-momentum', momentum)
   cmd:option('-dropout_rate', dropout_rate)
+  if class_weight then
+    cmd:option('-class_weight_switch', true)
+    cmd:option('-class_weight', class_weight)
+    cmd:option('-class_weight_str', arch2string(class_weight))
+  else
+    cmd:option('-class_weight_switch', false)
+  end
+  cmd:option('-cuda', true)
   cmd:text()
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1203/'
-  if option.feature_ex_type == 'conv' then
-    if option.artificial_weight then
-      filename = arch2string(mlp_architecture) .. '-true-' .. feature_ex_type .. '-seed-' .. db_seed
-    else
-      filename = arch2string(mlp_architecture) .. '-false-' .. feature_ex_type .. '-seed-' .. db_seed
-    end
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1208/'
+  if class_weight then
+    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type .. '-seed-' .. db_seed .. '-' .. arch2string(class_weight)
   else
     filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type .. '-seed-' .. db_seed
   end
@@ -105,9 +111,10 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
   print('==> # of max iteration: ' .. max_iter)
   iter = 1
 
-  if option.feature_ex_type == 'conv' and option.db_seed == 1 then
-    torch.save(foldername .. filename .. '-initial_model.net', model)
-  end
+  -- if option.feature_ex_type == 'conv' and option.db_seed == 1 then
+  --   torch.save(foldername .. filename .. '-initial_model.net', model)
+  -- end
+
   -- upiter = 1
   while iter <= max_iter do
     training()
@@ -116,13 +123,13 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     iter = iter + 1
   end
 
-  if option.feature_ex_type == 'conv' and option.db_seed == 1 then
-    torch.save(foldername .. filename .. '-trained_model.net', model)
-  end
+  -- if option.feature_ex_type == 'conv' and option.db_seed == 1 then
+  --   torch.save(foldername .. filename .. '-trained_model.net', model)
+  -- end
   ----------------------------------------------------------------------
-  test_result:write('/pred_list', pred_list)
-  test_result:write('/target_list', target_list)
-  test_result:close()
+  -- test_result:write('/pred_list', pred_list)
+  -- test_result:write('/target_list', target_list)
+  -- test_result:close()
   ----------------------------------------------------------------------
   recordfile = hdf5.open(foldername .. filename .. '.h5', 'w')
   recordfile:write('/train_accu', train_accu)
