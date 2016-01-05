@@ -44,26 +44,31 @@ for j = 1:length(a_X)
     a_Y_score(:,j) = aver_Y_score;    
 end
 
+x_plot = X;
+y_err_plot = Y_err;
+y_accu_plot = Y_accu;
+y_score_plot = Y_score;
+
 figure
-plot(a_X,a_Y_err(1,:),'-o', ...
-     a_X,a_Y_err(2,:),'-+');
-legend({'Initial', 'Modified'}, 'Location','northeast')
+plot(x_plot,y_err_plot(1,:),'-o', ...
+     x_plot,y_err_plot(2,:),'-+');
+legend({'Initial', 'Modified'}, 'Location','southeast')
 title('Negative log likelihood')
 xlabel('Epoch')
 ylabel('Negative log likelihood')
 
 figure
-plot(a_X,a_Y_accu(1,:),'-o', ...
-     a_X,a_Y_accu(2,:),'-+');
-legend({'Initial', 'Modified'}, 'Location','northeast')
+plot(x_plot,y_accu_plot(1,:),'-o', ...
+     x_plot,y_accu_plot(2,:),'-+');
+legend({'Initial', 'Modified'}, 'Location','southeast')
 title('Accuracy')
 xlabel('Epoch')
 ylabel('Accuracy')
 
 figure
-plot(a_X,a_Y_score(1,:),'-o', ...
-     a_X,a_Y_score(2,:),'-+');
-legend({'Initial', 'Modified'}, 'Location','northeast')
+plot(x_plot,y_score_plot(1,:),'-o', ...
+     x_plot,y_score_plot(2,:),'-+');
+legend({'Initial', 'Modified'}, 'Location','southeast')
 title('Challenge score')
 xlabel('Epoch')
 ylabel('Score')

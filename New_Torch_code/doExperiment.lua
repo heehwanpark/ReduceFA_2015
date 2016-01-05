@@ -70,15 +70,16 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
     cmd:option('-class_weight_switch', false)
   end
   cmd:option('-cuda', true)
+  cmd:option('-gaussian_noise', false)
   cmd:text()
 
   option = cmd:parse(arg or {})
 
-  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1208/'
+  foldername = '/home/heehwan/Workspace/Data/ReduceFA_2015/revised_output/1221/'
   if class_weight then
-    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type .. '-seed-' .. db_seed .. '-' .. arch2string(class_weight)
+    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type .. '-' .. arch2string(class_weight)
   else
-    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type .. '-seed-' .. db_seed
+    filename = arch2string(mlp_architecture) .. '-' .. feature_ex_type
   end
   print(filename)
   option.rundir = cmd:string(foldername, option, {dir=true})
@@ -109,19 +110,66 @@ function doExperiment(trdata_type, testdata_type, mlp_architecture, feature_ex_t
 
   print('==> Start training')
   print('==> # of max iteration: ' .. max_iter)
-  iter = 1
+
 
   -- if option.feature_ex_type == 'conv' and option.db_seed == 1 then
   --   torch.save(foldername .. filename .. '-initial_model.net', model)
   -- end
 
   -- upiter = 1
-  while iter <= max_iter do
-    training()
-    test()
 
-    iter = iter + 1
+  -- Initial
+  -- iter = 1
+  -- while iter <= max_iter do
+  --   training()
+  --   test()
+  --
+  --   iter = iter + 1
+  -- end
+
+  -- Early stopping
+
+  iter = 1 -- epoch index
+  t = 1 -- round index
+  max_round = max_iter / 10
+  diff_bound = 0.1
+  best_mean_fscore = 0
+  while t <= max_round do
+    round_fscore = torch.zeros(10)
+    round_best_fscore = 0
+
+    for i = 1,10 do
+      training()
+      test()
+      print('==> f-score ' .. fscore)
+      round_fscore[i] = fscore
+      if round_best_fscore < fscore then
+        round_best_fscore = fscore
+        round_best_model = model
+      end
+      iter = iter + 1
+    end
+
+    mean_fscore = torch.mean(round_fscore)
+    print('\n==> best mean fscore ' .. best_mean_fscore)
+    print('==> current mean fscore ' .. mean_fscore)
+
+    if mean_fscore > best_mean_fscore then
+      print('==> beat mean fscore update!')
+      best_mean_fscore = mean_fscore
+      best_model = round_best_model
+    else
+      diff_score = best_mean_fscore - mean_fscore
+      if diff_score > diff_bound then
+        print('END')
+        break
+      end
+    end
+
+    t = t + 1
   end
+
+  torch.save(foldername .. filename .. '-best_model.net', best_model)
 
   -- if option.feature_ex_type == 'conv' and option.db_seed == 1 then
   --   torch.save(foldername .. filename .. '-trained_model.net', model)

@@ -19,8 +19,11 @@ require 'doExperiment'
 -- 12/3
 weight_list = {{0.5, 0.5}, {0.4, 0.6}, {0.3, 0.7}, {0.2, 0.8}, {0.15, 0.85}, {0.1, 0.9}}
 
+-- 12/11
+class_weight_list = {1, 2, 3, 5, 10, 20, 50}
+
 -- type 1
-doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv')
+-- doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv')
 
 -- type 2
 -- for i = 1, table.getn(mlp_list) do
@@ -41,7 +44,10 @@ doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv')
 --   doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv', nil, nil, nil, nil, db_seed_list[i])
 -- end
 
--- 12/03
--- for i = 1, table.getn(weight_list) do
-  -- doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[3], 'max-min', nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, weight_list[i])
+-- 12/03, 12/11
+-- for i = 1, table.getn(class_weight_list) do
+--   doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv', nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, {1, 1, class_weight_list[i], 1})
 -- end
+
+-- 12/15
+doExperiment('chal600+mimicAll', 'chal+mimic', mlp_list[1], 'conv', nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, {1, 1, 5, 1})

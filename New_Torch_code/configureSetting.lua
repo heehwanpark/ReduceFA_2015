@@ -3,23 +3,22 @@ require 'optim'
 function configureSetting(option)
   print '==> Defining loss'
 
-  -- if option.class_weight_switch then
-  --   weight = torch.Tensor(2)
-  --   weight[1] = option.class_weight[1]
-  --   weight[2] = option.class_weight[2]
-  --   criterion = nn.ClassNLLCriterion(weight)
-  -- else
-  --   criterion = nn.ClassNLLCriterion()
-  -- end
+  if option.class_weight_switch then
+    if table.getn(option.class_weight) ~= 4 then
+      error("Class weight should be an 1-by-4 table")
+    else
+      weight = torch.Tensor(4)
+      weight[1] = option.class_weight[1]
+      weight[2] = option.class_weight[2]
+      weight[3] = option.class_weight[3]
+      weight[4] = option.class_weight[4]
+    end
 
-  weight = torch.Tensor(4)
-  weight[1] = 1
-  weight[2] = 1
-  weight[3] = 5
-  weight[4] = 1
-
-  require 'ClassNLLCriterion_HH'
-  criterion = nn.ClassNLLCriterion_HH(weight)
+    require 'ClassNLLCriterion_HH'
+    criterion = nn.ClassNLLCriterion_HH(weight)
+  else
+    criterion = nn.ClassNLLCriterion()
+  end
 
   if option.cuda then
     criterion:cuda()
@@ -39,9 +38,12 @@ function configureSetting(option)
     learningRateDecay = option.lr_decay
   }
 
-  require 'sgd_HH'
-  optimMethod = optim.sgd_HH
-  -- optimMethod = optim.sgd
+  if option.gaussian_noise then
+    require 'sgd_HH'
+    optimMethod = optim.sgd_HH
+  else
+    optimMethod = optim.sgd
+  end
   ----------------------------------------------------------------------
   print '==> Defining training procedure'
 

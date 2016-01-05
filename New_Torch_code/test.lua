@@ -27,12 +27,6 @@ function test()
     local err = criterion:forward(pred, target)
     f = f + err
     confusion:add(pred, target)
-
-    -- if iter == 81 then
-    --   y,i_y = torch.max(pred,1)
-    --   pred_list[t] = i_y[1]
-    --   target_list[t] = target
-    -- end
   end
 
   time = sys.clock() - time
@@ -52,6 +46,38 @@ function test()
   test_conf[iter][2] = cm[1][2]
   test_conf[iter][3] = cm[2][1]
   test_conf[iter][4] = cm[2][2]
+
+  fscore = (cm[1][1]+cm[2][2])/(cm[1][1]+cm[1][2]+5*cm[2][1]+cm[2][2])
+
+  -- Weight update
+  -- local x = cm[1][1] + cm[2][2]
+  -- local y = cm[1][2]
+  -- local z = cm[2][1]
+  --
+  -- -- Reset criterion weight: version 1
+  -- -- new_weight = torch.Tensor(4)
+  -- -- new_weight[1] = 0.5*(y+5*z)/(x+y+5*z)^2
+  -- -- new_weight[2] = -1*x/(x+y+5*z)^2
+  -- -- new_weight[3] = -5*x/(x+y+5*z)^2
+  -- -- new_weight[4] = 0.5*(y+5*z)/(x+y+5*z)^2
+  --
+  -- -- Reset criterion weight: version 2
+  -- local A = (y+5*z)/(x+y+5*z)^2
+  -- local B = -1*x/(x+y+5*z)^2
+  -- local C = -5*x/(x+y+5*z)^2
+  -- local alpha = (A-B)/(-1*C)
+  --
+  -- new_weight = torch.Tensor(4)
+  -- new_weight[1] = 1
+  -- new_weight[2] = 1
+  -- new_weight[3] = alpha
+  -- new_weight[4] = 1
+  --
+  -- require 'ClassNLLCriterion_HH'
+  -- criterion = nn.ClassNLLCriterion_HH(new_weight)
+  -- if option.cuda then
+  --   criterion:cuda()
+  -- end
 
   confusion:zero()
 end
