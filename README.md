@@ -21,12 +21,10 @@ In this folder, there are code files that I used for data preprocessing and disp
 ##### PhysioNetEasyDownload
 This folder contains Python code files for collecting ECG signal data automatically from PhysioNet.
 
-When I started this project, I had a problem to use WFDB software package, which PhysioNet provides, so I had to take a detour.
-
 ##### Theano_code
-This folder contains [Theano](http://deeplearning.net/software/theano/), Python-based machine learning framework, code files that I experimented. I used these codes for testing [deep belief network](http://deeplearning.net/tutorial/DBN.html).  
+This folder contains [Theano](http://deeplearning.net/software/theano/) code files that I experimented. I used these codes for testing [deep belief network](http://deeplearning.net/tutorial/DBN.html).  
 
 ##### Torch_code
-This folder contains [Torch7](http://torch.ch/), Lua-based machine learning framework, code files that I had experimented. This folder has my entire works, because I did most experiments using Torch. 
+This folder contains [Torch7](http://torch.ch/) code files that I had experimented. This folder has my entire works, because I did most experiments using Torch. 
 
 I had constructed my own deep learning architectures, such as deep neural networks, and deep convolutional networks. 
